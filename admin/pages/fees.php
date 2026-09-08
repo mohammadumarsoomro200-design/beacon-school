@@ -20,7 +20,7 @@ if (!function_exists('e')) {
 $message = '';
 $message_type = '';
 
-// 1. Generate Fee Voucher Only (For Parents)
+// 1. Action: Generate Fee Voucher Only (For Parents - Unpaid)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_voucher'])) {
     $student_id = intval($_POST['student_id'] ?? 0);
     $fee_month  = mysqli_real_escape_string($conn, trim($_POST['fee_month'] ?? date('F Y')));
@@ -29,27 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_voucher'])) 
     $notes      = mysqli_real_escape_string($conn, trim($_POST['notes'] ?? 'Monthly Tuition Fee'));
 
     if ($student_id > 0) {
-        // Calculate Unpaid Dues
-        $prev_dues = 0;
-        $qDues = @mysqli_query($conn, "SELECT SUM(amount - paid) as total_unpaid FROM fees WHERE student_id = '$student_id'");
-        if ($qDues && $rDues = mysqli_fetch_assoc($qDues)) {
-            $prev_dues = max(0, floatval($rDues['total_unpaid'] ?? 0));
-        }
-
-        $total_payable = $monthly_amount + $prev_dues;
         $receipt_no = 'VOUCH-' . date('Ymd') . '-' . rand(100, 999);
 
         $sqlInsert = "INSERT INTO fees (receipt_no, student_id, month, amount, paid, due_date, notes, status) 
-                      VALUES ('$receipt_no', '$student_id', '$fee_month', '$total_payable', 0, '$due_date', '$notes', 'unpaid')";
+                      VALUES ('$receipt_no', '$student_id', '$fee_month', '$monthly_amount', 0, '$due_date', '$notes', 'unpaid')";
 
-        $qInsert = mysqli_query($conn, $sqlInsert);
-
-        if ($qInsert) {
+        if (mysqli_query($conn, $sqlInsert)) {
             $message = "Fee Voucher generated successfully for Parent!";
             $message_type = "success";
         } else {
-            $dbError = mysqli_error($conn);
-            $message = "Error: " . ($dbError ? $dbError : "Could not generate voucher.");
+            $message = "Error generating voucher: " . mysqli_error($conn);
             $message_type = "error";
         }
     } else {
@@ -58,29 +47,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_voucher'])) 
     }
 }
 
-// 2. Separate Action: Record Fee Payment Later
+// 2. Action: Direct Fee Collect (Instant Paid)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['collect_direct_fee'])) {
+    $student_id = intval($_POST['student_id'] ?? 0);
+    $fee_month  = mysqli_real_escape_string($conn, trim($_POST['fee_month'] ?? date('F Y')));
+    $paid_amount = floatval($_POST['amount'] ?? 4500);
+    $notes      = mysqli_real_escape_string($conn, trim($_POST['notes'] ?? 'Direct Fee Payment Received'));
+    $today_date = date('Y-m-d');
+
+    if ($student_id > 0 && $paid_amount > 0) {
+        $receipt_no = 'REC-' . date('Ymd') . '-' . rand(100, 999);
+
+        $sqlInsert = "INSERT INTO fees (receipt_no, student_id, month, amount, paid, due_date, notes, status) 
+                      VALUES ('$receipt_no', '$student_id', '$fee_month', '$paid_amount', '$paid_amount', '$today_date', '$notes', 'paid')";
+
+        if (mysqli_query($conn, $sqlInsert)) {
+            $message = "Direct Fee collected and recorded as PAID!";
+            $message_type = "success";
+        } else {
+            $message = "Error recording fee: " . mysqli_error($conn);
+            $message_type = "error";
+        }
+    } else {
+        $message = "Please select a student and enter a valid amount.";
+        $message_type = "error";
+    }
+}
+
+// 3. Action: Delete Fee Record
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_voucher'])) {
+    $voucher_id = intval($_POST['voucher_id'] ?? 0);
+    if ($voucher_id > 0) {
+        if (mysqli_query($conn, "DELETE FROM fees WHERE id = '$voucher_id'")) {
+            $message = "Record deleted successfully!";
+            $message_type = "success";
+        } else {
+            $message = "Error deleting record.";
+            $message_type = "error";
+        }
+    }
+}
+
+// Action: Collect Fee from Voucher (Update Status or Delete & Move)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pay_fee_now'])) {
     $voucher_id = intval($_POST['voucher_id'] ?? 0);
     $receiving_amount = floatval($_POST['receiving_amount'] ?? 0);
 
     if ($voucher_id > 0 && $receiving_amount > 0) {
-        $qCheck = mysqli_query($conn, "SELECT amount, paid FROM fees WHERE id = '$voucher_id'");
-        if ($qCheck && $rCheck = mysqli_fetch_assoc($qCheck)) {
-            $total_amt = floatval($rCheck['amount']);
-            $current_paid = floatval($rCheck['paid']);
-            $new_paid = $current_paid + $receiving_amount;
+        // Option A: Agar aap chahte hain ke PURANA VOUCHER HI 'PAID' me convert ho jaye (Recommended)
+        $today_date = date('Y-m-d');
+        $new_receipt_no = 'REC-' . date('Ymd') . '-' . rand(100, 999);
 
-            $status = 'unpaid';
-            if ($new_paid >= $total_amt) {
-                $status = 'paid';
-                $new_paid = $total_amt;
-            } elseif ($new_paid > 0) {
-                $status = 'partial';
-            }
+        $sqlUpdate = "UPDATE fees 
+                      SET paid = '$receiving_amount', 
+                          status = 'paid', 
+                          due_date = '$today_date', 
+                          receipt_no = '$new_receipt_no' 
+                      WHERE id = '$voucher_id'";
 
-            mysqli_query($conn, "UPDATE fees SET paid = '$new_paid', status = '$status' WHERE id = '$voucher_id'");
-            $message = "Payment received and recorded successfully!";
+        if (mysqli_query($conn, $sqlUpdate)) {
+            $message = "Fee collected successfully! Voucher updated to PAID.";
             $message_type = "success";
+        } else {
+            $message = "Error updating payment: " . mysqli_error($conn);
+            $message_type = "error";
         }
     }
 }
@@ -128,14 +158,15 @@ if ($qSum && $rSum = mysqli_fetch_assoc($qSum)) {
 }
 $outstanding = max(0, $totalBilled - $totalCollected);
 
-// Fetch All Generated Vouchers (Flexible Query so all records show)
-$feeRecords = [];
+// Fetch Unpaid Vouchers vs Paid Records
+$unpaidVouchers = [];
+$paidRecords = [];
+
 $qFees = @mysqli_query($conn, "SELECT * FROM fees ORDER BY id DESC");
 if ($qFees && mysqli_num_rows($qFees) > 0) {
     while ($rFee = mysqli_fetch_assoc($qFees)) {
         $sId = intval($rFee['student_id']);
         
-        // Fetch student details
         $sName = 'Student #' . $sId;
         $sAdm = 'ADM-' . $sId;
         $sClass = '';
@@ -150,7 +181,12 @@ if ($qFees && mysqli_num_rows($qFees) > 0) {
         $rFee['std_name'] = $sName;
         $rFee['adm_no'] = $sAdm;
         $rFee['cls_name'] = $sClass;
-        $feeRecords[] = $rFee;
+
+        if (strtolower($rFee['status']) === 'paid') {
+            $paidRecords[] = $rFee;
+        } else {
+            $unpaidVouchers[] = $rFee;
+        }
     }
 }
 ?>
@@ -161,21 +197,27 @@ if ($qFees && mysqli_num_rows($qFees) > 0) {
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #334155; }
 .form-control { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; box-sizing: border-box; }
-.btn-submit { background: #b45309; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; }
-.btn-submit:hover { background: #92400e; }
+
+.tab-btn { padding: 10px 18px; border: none; background: #e2e8f0; font-weight: bold; font-size: 14px; cursor: pointer; border-radius: 6px 6px 0 0; color: #475569; }
+.tab-btn.active { background: #b45309; color: #fff; }
+.tab-btn.active-green { background: #16a34a; color: #fff; }
+
+.btn-submit { background: #b45309; color: #fff; border: none; padding: 11px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
+.btn-submit-green { background: #16a34a; color: #fff; border: none; padding: 11px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
 
 .badge-st { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
 .badge-paid { background: #d1fae5; color: #065f46; }
 .badge-unpaid { background: #fee2e2; color: #991b1b; }
-.badge-partial { background: #fef3c7; color: #92400e; }
 
-.table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; }
+.table-title { font-size: 18px; font-weight: bold; color: #1e293b; margin: 25px 0 10px 0; display: flex; align-items: center; justify-content: space-between; }
+.table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
 th, td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
 th { background: #f8fafc; font-weight: 600; color: #475569; }
 
 .btn-print { background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 4px; border:none; cursor:pointer; font-weight:bold; font-size:12px; }
 .btn-pay { background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 4px; border:none; cursor:pointer; font-weight:bold; font-size:12px; margin-left:5px; }
+.btn-delete { background: #dc2626; color: #fff; padding: 6px 12px; border-radius: 4px; border:none; cursor:pointer; font-weight:bold; font-size:12px; margin-left:5px; }
 
 @media print {
     body * { visibility: hidden; }
@@ -186,15 +228,13 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
 
 <div class="fee-grid">
     <div class="card-box">
-        <h3 style="margin-top:0; color:#1e293b;">Generate Fee Voucher (For Parents)</h3>
-
         <?php if ($message): ?>
             <div style="padding:10px; border-radius:6px; margin-bottom:15px; background:<?=$message_type==='success'?'#d1fae5':'#fee2e2'?>; color:<?=$message_type==='success'?'#065f46':'#991b1b'?>;">
                 <?=e($message)?>
             </div>
         <?php endif; ?>
 
-        <!-- Step 1: Filter by Class -->
+        <!-- Class Filter -->
         <form method="GET" action="index.php" id="classFilterForm" style="margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
             <input type="hidden" name="page" value="fees">
             <div class="form-group" style="margin-bottom:0;">
@@ -211,8 +251,14 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
             </div>
         </form>
 
-        <!-- Step 2: Generate Voucher Form -->
-        <form method="POST" action="index.php?page=fees">
+        <!-- Tabs Navigation -->
+        <div style="display:flex; gap:5px; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px;">
+            <button type="button" class="tab-btn active" id="tabVoucherBtn" onclick="switchTab('voucher')">🎫 Generate Fee Voucher</button>
+            <button type="button" class="tab-btn" id="tabDirectBtn" onclick="switchTab('direct')">💵 Direct Collect Fee</button>
+        </div>
+
+        <!-- Form 1: Generate Voucher (Unpaid) -->
+        <form method="POST" action="index.php?page=fees" id="formVoucher">
             <input type="hidden" name="filter_class_id" value="<?=$selected_class_id?>">
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -225,7 +271,7 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
                                 <option value="<?=$s['id']?>"><?=e($s['admission_no'])?> · <?=e($s['name'])?></option>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <option value="">No Students Found in this Class</option>
+                            <option value="">No Students Found</option>
                         <?php endif; ?>
                     </select>
                 </div>
@@ -251,11 +297,48 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
                 <input type="text" name="notes" class="form-control" value="Monthly Tuition Fee">
             </div>
 
-            <button type="submit" name="generate_voucher" class="btn-submit"> Generate Fee Voucher For Parent</button>
+            <button type="submit" name="generate_voucher" class="btn-submit">Generate Fee Voucher For Parent</button>
+        </form>
+
+        <!-- Form 2: Direct Collect Fee -->
+        <form method="POST" action="index.php?page=fees" id="formDirect" style="display:none;">
+            <input type="hidden" name="filter_class_id" value="<?=$selected_class_id?>">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>Select Student</label>
+                    <select name="student_id" class="form-control" required>
+                        <option value="">-- Select Student --</option>
+                        <?php if(!empty($students)): ?>
+                            <?php foreach($students as $s): ?>
+                                <option value="<?=$s['id']?>"><?=e($s['admission_no'])?> · <?=e($s['name'])?></option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="">No Students Found</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fee Month</label>
+                    <input type="text" name="fee_month" class="form-control" value="<?=date('F Y')?>" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Paid Amount (Rs.)</label>
+                <input type="number" name="amount" class="form-control" value="4500" required style="font-size:16px; font-weight:bold; color:#16a34a;">
+            </div>
+
+            <div class="form-group">
+                <label>Notes / Receipt Details</label>
+                <input type="text" name="notes" class="form-control" value="Direct Cash Payment Received">
+            </div>
+
+            <button type="submit" name="collect_direct_fee" class="btn-submit-green">✓ Pay & Save Direct Fee</button>
         </form>
     </div>
 
-    <!-- Summary Box -->
+    <!-- Fee Summary -->
     <div class="card-box" style="background:#f8fafc;">
         <h3 style="margin-top:0;">Fee Summary</h3>
         <div style="font-size:32px; font-weight:bold; color:#0f172a; margin:10px 0;">
@@ -274,7 +357,13 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
     </div>
 </div>
 
-<!-- Vouchers List Table -->
+<!-- ================= TABLE 1: UNPAID / PENDING VOUCHERS ================= -->
+<div class="table-title">
+    <span>📋 Unpaid / Pending Fee Vouchers</span>
+    <span style="font-size:12px; font-weight:normal; background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:20px;">
+        Total Unpaid: <?=count($unpaidVouchers)?>
+    </span>
+</div>
 <div class="table-wrap">
     <table>
         <thead>
@@ -282,16 +371,16 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
                 <th>Voucher #</th>
                 <th>Student</th>
                 <th>Month</th>
-                <th>Total Voucher (Rs.)</th>
-                <th>Paid Amount (Rs.)</th>
-                <th>Remaining Balance (Rs.)</th>
+                <th>Total Fee (Rs.)</th>
+                <th>Paid (Rs.)</th>
+                <th>Remaining (Rs.)</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <?php if(!empty($feeRecords)): ?>
-                <?php foreach($feeRecords as $f): ?>
+            <?php if(!empty($unpaidVouchers)): ?>
+                <?php foreach($unpaidVouchers as $f): ?>
                     <?php 
                         $amt = floatval($f['amount'] ?? 0);
                         $pd = floatval($f['paid'] ?? 0);
@@ -310,25 +399,81 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
                         <td><b>Rs. <?=number_format($amt, 2)?></b></td>
                         <td style="color:#16a34a;"><b>Rs. <?=number_format($pd, 2)?></b></td>
                         <td style="color:#dc2626;"><b>Rs. <?=number_format($bal, 2)?></b></td>
+                        <td><span class="badge-st badge-<?=$st?>"><?=e($st)?></span></td>
                         <td>
-                            <span class="badge-st badge-<?=$st?>"><?=e($st)?></span>
-                        </td>
-                        <td>
-                            <button onclick="printVoucher('<?=e($rcpt)?>', '<?=e($f['std_name'])?>', '<?=e($f['adm_no'])?>', '<?=e($f['cls_name'])?>', '<?=e($mth)?>', '<?=$amt?>', '<?=$pd?>', '<?=$bal?>', '<?=e($f['due_date'] ?? '')?>')" class="btn-print">📄 Print Voucher</button>
-                            <?php if($bal > 0): ?>
-                                <button onclick="openPayModal('<?=$f['id']?>', '<?=e($f['std_name'])?>', '<?=$bal?>')" class="btn-pay">💵 Collect Fee</button>
-                            <?php endif; ?>
+                            <button onclick="printVoucher('<?=e($rcpt)?>', '<?=e($f['std_name'])?>', '<?=e($f['adm_no'])?>', '<?=e($f['cls_name'])?>', '<?=e($mth)?>', '<?=$amt?>', '<?=$pd?>', '<?=$bal?>', '<?=e($f['due_date'] ?? '')?>')" class="btn-print">📄 Print</button>
+                            <button onclick="openPayModal('<?=$f['id']?>', '<?=e($f['std_name'])?>', '<?=$bal?>')" class="btn-pay">💵 Collect Fee</button>
+                            
+                            <form method="POST" action="index.php?page=fees" style="display:inline;" onsubmit="return confirm('Delete this voucher?');">
+                                <input type="hidden" name="voucher_id" value="<?=$f['id']?>">
+                                <button type="submit" name="delete_voucher" class="btn-delete">🗑️ Delete</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="8" style="text-align:center; padding:20px; color:#888;">No fee vouchers generated yet. Select a class and generate voucher.</td></tr>
+                <tr><td colspan="8" style="text-align:center; padding:20px; color:#888;">No pending vouchers found.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
 </div>
 
-<!-- Modal 1: Printable Voucher for Parents -->
+<!-- ================= TABLE 2: PAID FEES HISTORY ================= -->
+<div class="table-title">
+    <span style="color:#16a34a;">✅ Paid Fees History</span>
+    <span style="font-size:12px; font-weight:normal; background:#d1fae5; color:#065f46; padding:4px 10px; border-radius:20px;">
+        Total Paid Transactions: <?=count($paidRecords)?>
+    </span>
+</div>
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr style="background:#f0fdf4;">
+                <th>Receipt #</th>
+                <th>Student</th>
+                <th>Month</th>
+                <th>Paid Amount (Rs.)</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if(!empty($paidRecords)): ?>
+                <?php foreach($paidRecords as $f): ?>
+                    <?php 
+                        $amt = floatval($f['amount'] ?? 0);
+                        $rcpt = $f['receipt_no'] ?? ('REC-#' . $f['id']);
+                        $mth = $f['month'] ?? 'N/A';
+                    ?>
+                    <tr>
+                        <td><b><?=e($rcpt)?></b></td>
+                        <td>
+                            <b><?=e($f['std_name'])?></b><br>
+                            <small style="color:#64748b;"><?=e($f['adm_no'])?> <?= $f['cls_name'] ? '('.e($f['cls_name']).')' : '' ?></small>
+                        </td>
+                        <td><?=e($mth)?></td>
+                        <td style="color:#16a34a;"><b>Rs. <?=number_format($amt, 2)?></b></td>
+                        <td><?=e($f['due_date'] ?? 'N/A')?></td>
+                        <td><span class="badge-st badge-paid">PAID</span></td>
+                        <td>
+                            <button onclick="printVoucher('<?=e($rcpt)?>', '<?=e($f['std_name'])?>', '<?=e($f['adm_no'])?>', '<?=e($f['cls_name'])?>', '<?=e($mth)?>', '<?=$amt?>', '<?=$amt?>', '0', '<?=e($f['due_date'] ?? '')?>')" class="btn-print">📄 Print Receipt</button>
+                            
+                            <form method="POST" action="index.php?page=fees" style="display:inline;" onsubmit="return confirm('Delete this paid fee entry?');">
+                                <input type="hidden" name="voucher_id" value="<?=$f['id']?>">
+                                <button type="submit" name="delete_voucher" class="btn-delete">🗑️ Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No paid fee records found.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal 1: Printable Voucher/Receipt -->
 <div id="voucherModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:#fff; width:90%; max-width:500px; padding:25px; border-radius:8px;" id="printableVoucher">
         <div style="text-align:center; border-bottom:2px solid #333; padding-bottom:10px; margin-bottom:15px;">
@@ -336,29 +481,29 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
             <small>FEE VOUCHER & RECEIPT</small>
         </div>
         <table width="100%" style="font-size:14px; margin-bottom:15px;">
-            <tr><td><b>Voucher #:</b> <span id="v_rcpt"></span></td><td align="right"><b>Date:</b> <?=date('d-M-Y')?></td></tr>
+            <tr><td><b>Receipt/Voucher #:</b> <span id="v_rcpt"></span></td><td align="right"><b>Date:</b> <?=date('d-M-Y')?></td></tr>
             <tr><td><b>Student:</b> <span id="v_std"></span></td><td align="right"><b>Adm No:</b> <span id="v_adm"></span></td></tr>
             <tr><td><b>Class:</b> <span id="v_cls"></span></td><td align="right"><b>Month:</b> <span id="v_month"></span></td></tr>
             <tr><td><b>Due Date:</b> <span id="v_due"></span></td><td></td></tr>
         </table>
         <table width="100%" border="1" cellpadding="8" style="border-collapse:collapse; margin-bottom:15px; font-size:14px;">
             <tr style="background:#f2f2f2;"><th>Description</th><th align="right">Amount (Rs.)</th></tr>
-            <tr><td>Monthly Tuition & Previous Dues Fee</td><td align="right" id="v_amt"></td></tr>
+            <tr><td>Monthly Tuition Fee</td><td align="right" id="v_amt"></td></tr>
             <tr><td>Paid Amount</td><td align="right" id="v_paid" style="color:green;"></td></tr>
-            <tr style="font-weight:bold; background:#fafafa;"><td>Remaining Balance Dues</td><td align="right" id="v_bal" style="color:red;"></td></tr>
+            <tr style="font-weight:bold; background:#fafafa;"><td>Remaining Balance</td><td align="right" id="v_bal" style="color:red;"></td></tr>
         </table>
         <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:12px;">
             <div>___________________<br>Accounts Officer</div>
             <div>___________________<br>Parent/Student Sign</div>
         </div>
         <div style="text-align:center; margin-top:20px;" class="no-print">
-            <button onclick="window.print()" style="background:#16a34a; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:bold;">Print Voucher</button>
+            <button onclick="window.print()" style="background:#16a34a; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:bold;">Print Receipt</button>
             <button onclick="closeModal('voucherModal')" style="background:#64748b; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:bold; margin-left:10px;">Close</button>
         </div>
     </div>
 </div>
 
-<!-- Modal 2: Collect Fee / Record Payment (Separate Action) -->
+<!-- Modal 2: Collect Fee Payment -->
 <div id="payModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div style="background:#fff; width:90%; max-width:400px; padding:25px; border-radius:8px;">
         <h3 style="margin-top:0; color:#16a34a;">Collect Fee Payment</h3>
@@ -379,6 +524,25 @@ th { background: #f8fafc; font-weight: 600; color: #475569; }
 </div>
 
 <script>
+function switchTab(type) {
+    var vForm = document.getElementById('formVoucher');
+    var dForm = document.getElementById('formDirect');
+    var vBtn = document.getElementById('tabVoucherBtn');
+    var dBtn = document.getElementById('tabDirectBtn');
+
+    if (type === 'voucher') {
+        vForm.style.display = 'block';
+        dForm.style.display = 'none';
+        vBtn.className = 'tab-btn active';
+        dBtn.className = 'tab-btn';
+    } else {
+        vForm.style.display = 'none';
+        dForm.style.display = 'block';
+        vBtn.className = 'tab-btn';
+        dBtn.className = 'tab-btn active-green';
+    }
+}
+
 function printVoucher(rcpt, std, adm, cls, month, amt, paid, bal, due) {
     document.getElementById('v_rcpt').innerText = rcpt;
     document.getElementById('v_std').innerText = std;

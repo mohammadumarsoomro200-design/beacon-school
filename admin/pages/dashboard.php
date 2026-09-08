@@ -12,8 +12,17 @@ $students = $teachers = $classesCount = $newAdmissions = $due = 0;
 $presentCount = $absentCount = $leaveCount = 0;
 $recent = [];
 
-// Selected Date Handling (Default: Today)
-$selectedDate = isset($_GET['att_date']) && !empty($_GET['att_date']) ? $_GET['att_date'] : date('Y-m-d');
+// Date setup (Default: Date picker OR latest date in DB)
+$selectedDate = $_GET['att_date'] ?? '';
+if (empty($selectedDate) && $conn) {
+    $qD = @mysqli_query($conn, "SELECT MAX(attendance_date) as mdate FROM attendance");
+    if ($qD && $rD = mysqli_fetch_assoc($qD)) {
+        $selectedDate = $rD['mdate'];
+    }
+}
+if (empty($selectedDate)) {
+    $selectedDate = date('Y-m-d');
+}
 
 $classListData = [];
 
@@ -31,108 +40,105 @@ if ($conn) {
     $q4 = @mysqli_query($conn, "SELECT COUNT(*) as total FROM admission_enquiries");
     if ($q4 && $r4 = mysqli_fetch_assoc($q4)) { $newAdmissions = (int)$r4['total']; }
 
-    // 2. Detect Attendance Date Column
-    $dateCol = 'date';
-    $chkCol = @mysqli_query($conn, "SHOW COLUMNS FROM attendance LIKE 'attendance_date'");
-    if ($chkCol && mysqli_num_rows($chkCol) > 0) {
-        $dateCol = 'attendance_date';
-    } else {
-        $chkCol2 = @mysqli_query($conn, "SHOW COLUMNS FROM attendance LIKE 'att_date'");
-        if ($chkCol2 && mysqli_num_rows($chkCol2) > 0) {
-            $dateCol = 'att_date';
-        }
-    }
-
-    // 3. Overall Counts for Selected Date (Trimmed & Lowercase comparison)
-    $qp = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'present'");
+    // 2. Attendance Summary Counts
+    $qp = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE attendance_date = '$selectedDate' AND status = 'present'");
     if ($qp && $rp = mysqli_fetch_assoc($qp)) { $presentCount = (int)$rp['total']; }
 
-    $qa = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'absent'");
+    $qa = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE attendance_date = '$selectedDate' AND status = 'absent'");
     if ($qa && $ra = mysqli_fetch_assoc($qa)) { $absentCount = (int)$ra['total']; }
 
-    $ql = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'leave'");
+    $ql = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE attendance_date = '$selectedDate' AND status = 'leave'");
     if ($ql && $rl = mysqli_fetch_assoc($ql)) { $leaveCount = (int)$rl['total']; }
 
-    // 4. Fetch All Classes & Attendance Status
+    // 3. Fetch All Classes
+    $classesArr = [];
     $qClasses = @mysqli_query($conn, "SELECT * FROM classes ORDER BY id ASC");
-
-    if ($qClasses && mysqli_num_rows($qClasses) > 0) {
-        while ($cls = mysqli_fetch_assoc($qClasses)) {
-            $cid = $cls['id'];
-            $cName = $cls['class_name'] ?? $cls['name'] ?? '';
-            $cSec = $cls['section'] ?? '';
-            $fullClassName = trim($cName . ' ' . $cSec);
-            if(!$fullClassName) { $fullClassName = "Class #" . $cid; }
-
-            // Find Assigned Class Teacher Name
-            $teacherName = 'Not Assigned';
-            $t_id = $cls['teacher_id'] ?? $cls['class_teacher_id'] ?? null;
-            if ($t_id) {
-                $qT = @mysqli_query($conn, "SELECT name FROM teachers WHERE id = '$t_id'");
-                if ($qT && $rT = mysqli_fetch_assoc($qT)) {
-                    $teacherName = $rT['name'];
-                }
-            }
-
-            // Robust Attendance Joining (Supports class_id directly in attendance or via students table)
-            $qAtt = @mysqli_query($conn, "
-                SELECT 
-                    a.id,
-                    LOWER(TRIM(a.status)) as raw_status, 
-                    s.student_name, 
-                    s.name as std_alt_name,
-                    s.admission_no,
-                    a.teacher_id as marked_t_id
-                FROM attendance a
-                LEFT JOIN students s ON s.id = a.student_id
-                WHERE (a.class_id = '$cid' OR s.class_id = '$cid') 
-                  AND DATE(a.`$dateCol`) = '$selectedDate'
-                ORDER BY s.student_name ASC, s.name ASC
-            ");
-
-            $hasAttendance = false;
-            $markedTeacher = $teacherName;
-            $studentsList = ['present' => [], 'absent' => [], 'leave' => []];
-
-            if ($qAtt && mysqli_num_rows($qAtt) > 0) {
-                $hasAttendance = true;
-                while ($attRow = mysqli_fetch_assoc($qAtt)) {
-                    if (!empty($attRow['marked_t_id'])) {
-                        $mtid = $attRow['marked_t_id'];
-                        $qMT = @mysqli_query($conn, "SELECT name FROM teachers WHERE id = '$mtid'");
-                        if ($qMT && $rMT = mysqli_fetch_assoc($qMT)) {
-                            $markedTeacher = $rMT['name'];
-                        }
-                    }
-                    $st = strtolower(trim($attRow['raw_status'] ?? ''));
-                    $sName = !empty($attRow['student_name']) ? $attRow['student_name'] : ($attRow['std_alt_name'] ?? 'Student');
-                    
-                    $stdItem = [
-                        'admission_no' => $attRow['admission_no'] ?? '-',
-                        'student_name' => $sName
-                    ];
-
-                    if ($st === 'present') {
-                        $studentsList['present'][] = $stdItem;
-                    } elseif ($st === 'absent') {
-                        $studentsList['absent'][] = $stdItem;
-                    } elseif ($st === 'leave') {
-                        $studentsList['leave'][] = $stdItem;
-                    }
-                }
-            }
-
-            $classListData[] = [
-                'class_id' => $cid,
-                'class_name' => $fullClassName,
-                'teacher_name' => $markedTeacher,
-                'has_attendance' => $hasAttendance,
-                'students' => $studentsList
-            ];
+    if ($qClasses) {
+        while ($c = mysqli_fetch_assoc($qClasses)) {
+            $classesArr[$c['id']] = $c;
         }
     }
 
-    // 5. Fees & Recent Enquiries
+    // 4. Fetch All Students (Mapping ID -> Data)
+    $studentsArr = [];
+    $qStd = @mysqli_query($conn, "SELECT * FROM students");
+    if ($qStd) {
+        while ($s = mysqli_fetch_assoc($qStd)) {
+            $studentsArr[$s['id']] = $s;
+        }
+    }
+
+    // 5. Fetch All Teachers (Mapping ID -> Name)
+    $teachersArr = [];
+    $qT = @mysqli_query($conn, "SELECT id, name FROM teachers");
+    if ($qT) {
+        while ($t = mysqli_fetch_assoc($qT)) {
+            $teachersArr[$t['id']] = $t['name'];
+        }
+    }
+
+    // 6. Fetch ALL Attendance Records for Selected Date
+    $attRecords = [];
+    $qAtt = @mysqli_query($conn, "SELECT * FROM attendance WHERE attendance_date = '$selectedDate'");
+    if ($qAtt) {
+        while ($a = mysqli_fetch_assoc($qAtt)) {
+            $attRecords[] = $a;
+        }
+    }
+
+    // 7. Group Data Class-wise
+    foreach ($classesArr as $cid => $cls) {
+        $cName = trim($cls['class_name'] ?? $cls['name'] ?? '');
+        $cSec = trim($cls['section'] ?? '');
+        $fullClassName = trim($cName . ' ' . $cSec);
+        if(!$fullClassName) { $fullClassName = "Class #" . $cid; }
+
+        $t_id = $cls['teacher_id'] ?? $cls['class_teacher_id'] ?? null;
+        $teacherName = ($t_id && isset($teachersArr[$t_id])) ? $teachersArr[$t_id] : 'Not Assigned';
+
+        $hasAttendance = false;
+        $studentsList = ['present' => [], 'absent' => [], 'leave' => []];
+
+        foreach ($attRecords as $att) {
+            $stId = $att['student_id'];
+            $stData = $studentsArr[$stId] ?? null;
+
+            // Check if student belongs to this class
+            $stClassId = $stData['class_id'] ?? $stData['class'] ?? null;
+            
+            if ($stClassId == $cid || (strcasecmp((string)$stClassId, (string)$cName) == 0)) {
+                $hasAttendance = true;
+                
+                $stName = $stData['student_name'] ?? $stData['name'] ?? 'Student #' . $stId;
+                $admNo = $stData['admission_no'] ?? $stId;
+                $stStatus = strtolower(trim($att['status']));
+
+                $item = [
+                    'admission_no' => $admNo,
+                    'student_name' => $stName,
+                    'status' => ucfirst($stStatus)
+                ];
+
+                if ($stStatus === 'present') {
+                    $studentsList['present'][] = $item;
+                } elseif ($stStatus === 'absent') {
+                    $studentsList['absent'][] = $item;
+                } elseif ($stStatus === 'leave') {
+                    $studentsList['leave'][] = $item;
+                }
+            }
+        }
+
+        $classListData[] = [
+            'class_id' => $cid,
+            'class_name' => $fullClassName,
+            'teacher_name' => $teacherName,
+            'has_attendance' => $hasAttendance,
+            'students' => $studentsList
+        ];
+    }
+
+    // 8. Fees & Enquiries
     $q6 = @mysqli_query($conn, "SELECT SUM(amount - paid) as total_due FROM fees");
     if (!$q6) { $q6 = @mysqli_query($conn, "SELECT SUM(amount) as total_due FROM fees"); }
     if ($q6 && $r6 = mysqli_fetch_assoc($q6)) { $due = (float)($r6['total_due'] ?? 0); }
@@ -159,7 +165,6 @@ if ($conn) {
 .stat-card-att b { font-size: 22px; font-weight: bold; color: #111; display: block; margin: 4px 0; }
 .stat-card-att small { color: #888; font-size: 11px; }
 
-/* Modal Styles */
 .att-modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; }
 .att-modal-content { background:#fff; width:92%; max-width:700px; padding:20px; border-radius:8px; max-height:85vh; overflow-y:auto; }
 
@@ -187,7 +192,7 @@ if ($conn) {
     <div class="stat"><span>New Admissions</span><b><?=number_format($newAdmissions)?></b><i>📝</i></div>
 </div>
 
-<!-- Date Selector Header -->
+<!-- Date Selector Box -->
 <div class="date-picker-box">
     <div>
         <h3 style="margin:0; font-size:16px; color:#1e293b;">📅 Attendance Records Overview</h3>
@@ -202,7 +207,7 @@ if ($conn) {
     </form>
 </div>
 
-<!-- Attendance Overview Cards -->
+<!-- Attendance Cards -->
 <div class="stats-att">
     <div class="stat-card-att all" onclick="showAttList('all')">
         <span style="color:#0d6efd;">All Classes Status</span>
@@ -305,12 +310,13 @@ function showAttList(filterType) {
         body.innerHTML = "<p style='text-align:center; color:#888; padding:20px;'>No classes found in the database.</p>";
     } else {
         var html = '';
+        var matchesFound = 0;
         
         classListData.forEach(function(cls, idx) {
             var hasAtt = cls.has_attendance;
-            var pList = cls.students.present;
-            var aList = cls.students.absent;
-            var lList = cls.students.leave;
+            var pList = cls.students.present || [];
+            var aList = cls.students.absent || [];
+            var lList = cls.students.leave || [];
 
             var targetList = [];
             if(filterType === 'present') targetList = pList;
@@ -322,9 +328,9 @@ function showAttList(filterType) {
                 return;
             }
 
+            matchesFound++;
             html += '<div class="class-card">';
             
-            // Header
             html += '<div class="class-header" onclick="toggleBody(' + idx + ')">';
             html += '<div><b style="font-size:15px; color:#222;">🏫 ' + cls.class_name + '</b></div>';
             
@@ -335,7 +341,6 @@ function showAttList(filterType) {
             }
             html += '</div>';
 
-            // Body
             html += '<div id="classBody_' + idx + '" class="class-body">';
             
             if(hasAtt) {
@@ -348,28 +353,31 @@ function showAttList(filterType) {
 
                 if(targetList.length > 0) {
                     html += '<table width="100%" cellpadding="6" style="border-collapse:collapse; font-size:13px; border:1px solid #eee;">';
-                    html += '<thead><tr style="background:#f4f4f4; text-align:left;"><th>ADM NO</th><th>STUDENT NAME</th>' + (filterType === 'all' ? '<th>STATUS</th>' : '') + '</tr></thead><tbody>';
+                    html += '<thead><tr style="background:#f4f4f4; text-align:left;"><th>ADM NO / ID</th><th>STUDENT NAME</th>' + (filterType === 'all' ? '<th>STATUS</th>' : '') + '</tr></thead><tbody>';
                     
-                    if(filterType === 'all') {
-                        pList.forEach(function(s){ html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td><td><span style="color:#28a745; font-weight:bold;">Present</span></td></tr>'; });
-                        aList.forEach(function(s){ html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td><td><span style="color:#dc3545; font-weight:bold;">Absent</span></td></tr>'; });
-                        lList.forEach(function(s){ html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td><td><span style="color:#ffc107; font-weight:bold;">Leave</span></td></tr>'; });
-                    } else {
-                        targetList.forEach(function(s){
-                            html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td></tr>';
-                        });
-                    }
+                    targetList.forEach(function(s){
+                        var statusColor = '#28a745';
+                        if(s.status.toLowerCase() === 'absent') statusColor = '#dc3545';
+                        if(s.status.toLowerCase() === 'leave') statusColor = '#ffc107';
+
+                        html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td>';
+                        if(filterType === 'all') {
+                            html += '<td><span style="color:'+statusColor+'; font-weight:bold;">'+s.status+'</span></td>';
+                        }
+                        html += '</tr>';
+                    });
+                    
                     html += '</tbody></table>';
                 }
             } else {
-                html += '<div class="teacher-info" style="color:#dc3545;"><b>Class Teacher:</b> ' + cls.teacher_name + '</div>';
+                html += '<div class="teacher-info" style="color:#dc3545;"><b>Teacher:</b> ' + cls.teacher_name + '</div>';
                 html += '<p style="margin:0; font-size:13px; color:#666;">Attendance for this class has not been marked yet for this date.</p>';
             }
 
             html += '</div></div>';
         });
 
-        if(html === '') {
+        if(matchesFound === 0) {
             html = "<p style='text-align:center; color:#888; padding:20px;'>No records found for this date/category.</p>";
         }
 

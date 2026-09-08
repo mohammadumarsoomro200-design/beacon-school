@@ -36,17 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $selected_class_id = (int)($_GET['class_id'] ?? 0);
 
 // Fetch Dropdown Data
-$exams = $pdo->query('SELECT e.*,c.class_name,c.section FROM exams e LEFT JOIN classes c ON c.id=e.class_id ORDER BY e.id DESC')->fetchAll();
+$exams = $pdo->query('SELECT e.*, c.class_name, c.section FROM exams e LEFT JOIN classes c ON c.id=e.class_id ORDER BY e.id DESC')->fetchAll();
 $classes = $pdo->query('SELECT * FROM classes ORDER BY class_name,section')->fetchAll();
 $subjects = $pdo->query('SELECT * FROM subjects ORDER BY subject_name')->fetchAll();
 
-if ($selected_class_id > 0) {
-    $stmt = $pdo->prepare("SELECT id,admission_no,student_name FROM students WHERE status='active' AND class_id=? ORDER BY student_name");
-    $stmt->execute([$selected_class_id]);
-    $students = $stmt->fetchAll();
-} else {
-    $students = $pdo->query("SELECT id,admission_no,student_name FROM students WHERE status='active' ORDER BY student_name")->fetchAll();
-}
+// Fetch ALL active students with joined class information
+$all_students = $pdo->query("SELECT s.id, s.admission_no, s.student_name, s.class_id, c.class_name, c.section 
+                             FROM students s 
+                             LEFT JOIN classes c ON c.id = s.class_id 
+                             ORDER BY s.student_name ASC")->fetchAll();
 
 // Fetch Raw Results
 $sql = 'SELECT r.*, e.exam_name, s.student_name, s.admission_no, c.class_name, c.section, sub.subject_name 
@@ -97,6 +95,7 @@ foreach ($raw_results as $row) {
             <label>Exam Name<input required name="exam_name" placeholder="First Term 2026"></label>
             <label>Class
                 <select name="class_id" required>
+                    <option value="">-- Select Class --</option>
                     <?php foreach($classes as $c):?>
                         <option value="<?=$c['id']?>"><?=e($c['class_name'].' - '.$c['section'])?></option>
                     <?php endforeach;?>
@@ -112,27 +111,35 @@ foreach ($raw_results as $row) {
         <h2>Enter Result</h2>
         <form method="post" class="form-grid">
             <input type="hidden" name="csrf" value="<?=e(csrf())?>">
+            
             <label>Exam
-                <select name="exam_id" required>
-                    <?php foreach($exams as $x):?>
-                        <option value="<?=$x['id']?>"><?=e($x['exam_name'].' · '.$x['class_name'].' '.$x['section'])?></option>
+                <select name="exam_id" id="exam_select" required onchange="filterStudentsByExam()">
+                    <option value="">-- Select Exam --</option>
+                    <?php foreach($exams as $x): 
+                        $c_title = trim(($x['class_name'] ?? '').' '.($x['section'] ?? ''));
+                    ?>
+                        <option value="<?=$x['id']?>" data-class-id="<?=$x['class_id']?>">
+                            <?=e($x['exam_name'].' · '.$c_title)?>
+                        </option>
                     <?php endforeach;?>
                 </select>
             </label>
+            
             <label>Student
-                <select name="student_id" required>
-                    <?php foreach($students as $x):?>
-                        <option value="<?=$x['id']?>"><?=e($x['admission_no'].' · '.$x['student_name'])?></option>
-                    <?php endforeach;?>
+                <select name="student_id" id="student_select" required>
+                    <option value="">-- Select Exam First --</option>
                 </select>
             </label>
+            
             <label>Subject
                 <select name="subject_id" required>
+                    <option value="">-- Select Subject --</option>
                     <?php foreach($subjects as $x):?>
                         <option value="<?=$x['id']?>"><?=e($x['subject_name'])?></option>
                     <?php endforeach;?>
                 </select>
             </label>
+            
             <label>Marks<input type="number" step="0.01" name="marks" required></label>
             <label>Total Marks<input type="number" step="0.01" name="total_marks" value="100" required></label>
             <label>Remarks<input name="remarks"></label>
@@ -204,8 +211,49 @@ foreach ($raw_results as $row) {
     </div>
 </section>
 
-<!-- Print Combined Window Script -->
+<!-- Dynamic Student Filtering Script -->
 <script>
+var ALL_STUDENTS = <?=json_encode($all_students)?>;
+
+function filterStudentsByExam() {
+    var examSelect = document.getElementById('exam_select');
+    var studentSelect = document.getElementById('student_select');
+    var selectedOption = examSelect.options[examSelect.selectedIndex];
+
+    if (!selectedOption || !selectedOption.value) {
+        studentSelect.innerHTML = '<option value="">-- Select Exam First --</option>';
+        return;
+    }
+
+    var targetClassId = String(selectedOption.getAttribute('data-class-id') || '');
+
+    studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
+    var matchedStudents = [];
+
+    if (ALL_STUDENTS && ALL_STUDENTS.length > 0) {
+        ALL_STUDENTS.forEach(function(st) {
+            var stClassId = String(st.class_id || '');
+            if (targetClassId && stClassId === targetClassId) {
+                matchedStudents.push(st);
+            }
+        });
+
+        // Safe Fallback: Agar kisi class id mismatch ki waja se zero match milay toh saare students show karo
+        if (matchedStudents.length === 0) {
+            matchedStudents = ALL_STUDENTS;
+        }
+
+        matchedStudents.forEach(function(st) {
+            var opt = document.createElement('option');
+            opt.value = st.id;
+            var classInfo = (st.class_name ? ' [' + st.class_name + ' ' + (st.section || '') + ']' : '');
+            opt.textContent = st.student_name + ' (' + (st.admission_no || 'ID: ' + st.id) + ')' + classInfo;
+            studentSelect.appendChild(opt);
+        });
+    }
+}
+
+// Print Combined Window Script
 function printCombinedCard(data) {
     var perc = data.max_total > 0 ? ((data.obtained_total / data.max_total) * 100).toFixed(1) : '0.0';
     
