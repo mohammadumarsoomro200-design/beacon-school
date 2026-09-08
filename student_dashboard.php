@@ -31,7 +31,7 @@ $student = [
     'status' => 'paid'
 ];
 
-// 2. FETCH STUDENT RECORD FROM DATABASE (Multiple Matching Fields)
+// 2. FETCH STUDENT RECORD FROM DATABASE
 try {
     $stmt = $db_conn->prepare("SELECT * FROM students WHERE id = ? OR admission_no = ? OR student_name = ? OR email = ? LIMIT 1");
     $stmt->execute([$student_id, $username, $full_name, $username]);
@@ -46,20 +46,39 @@ $real_student_id = $student['id'];
 $admission_no = $student['admission_no'] ?? $username;
 $std_name = $student['student_name'] ?? $full_name;
 
-// 3. FETCH DASHBOARD DATA
+// 3. FETCH ATTENDANCE WITH COLUMN AUTO-DETECTION
 $attendance_records = [];
 try {
-    $att_stmt = $db_conn->prepare("SELECT attendance_date, status FROM attendance WHERE student_id = ? OR student_id = ? OR student_name = ? ORDER BY attendance_date DESC");
+    // Detect column name dynamically for date
+    $dateCol = 'attendance_date';
+    $colCheck = $db_conn->query("SHOW COLUMNS FROM attendance LIKE 'attendance_date'");
+    if (!$colCheck || $colCheck->rowCount() == 0) {
+        $colCheck2 = $db_conn->query("SHOW COLUMNS FROM attendance LIKE 'date'");
+        if ($colCheck2 && $colCheck2->rowCount() > 0) {
+            $dateCol = 'date';
+        } else {
+            $dateCol = 'att_date';
+        }
+    }
+
+    $att_stmt = $db_conn->prepare("
+        SELECT `$dateCol` AS attendance_date, status 
+        FROM attendance 
+        WHERE student_id = ? OR student_id = ? OR student_name = ? 
+        ORDER BY `$dateCol` DESC
+    ");
     $att_stmt->execute([$real_student_id, $admission_no, $std_name]);
     $attendance_records = $att_stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Throwable $e) {}
 
+// 4. FETCH ANNOUNCEMENTS
 $announcements = [];
 try {
     $ann_stmt = $db_conn->query("SELECT title, message, created_at FROM announcements WHERE status = 'active' ORDER BY id DESC LIMIT 5");
     if ($ann_stmt) { $announcements = $ann_stmt->fetchAll(PDO::FETCH_ASSOC) ?: []; }
 } catch (Throwable $e) {}
 
+// 5. FETCH EXAM RESULTS
 $exam_results = [];
 try {
     $res_stmt = $db_conn->prepare("SELECT subject_name, marks_obtained, total_marks, grade FROM exam_results WHERE student_id = ? OR student_id = ? OR student_name = ?");
@@ -67,6 +86,7 @@ try {
     $exam_results = $res_stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Throwable $e) {}
 
+// 6. FETCH FEE VOUCHERS
 $fee_vouchers = [];
 try {
     $fee_stmt = $db_conn->prepare("SELECT * FROM fees WHERE student_id = ? OR student_id = ? OR student_name = ?");
@@ -74,10 +94,8 @@ try {
     $fee_vouchers = $fee_stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Throwable $e) {}
 
-// 4. BLOCK / POPUP LOGIC
+// 7. BLOCK / POPUP LOGIC
 $st_val = strtolower(trim((string)($student['status'] ?? 'paid')));
-
-// Student blocked tabhi hoga jab status explicitly 'unpaid', 'blocked', 'inactive', ya '0' hoga
 $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
 ?>
 <!doctype html>
@@ -114,6 +132,11 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
         .empty { color: #888; font-style: italic; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: capitalize; }
+        .status-present { background: #d4edda; color: #155724; }
+        .status-absent { background: #f8d7da; color: #721c24; }
+        .status-leave { background: #fff3cd; color: #856404; }
 
         /* FULLSCREEN LOCK OVERLAY */
         .blocked-modal-overlay { 
@@ -155,7 +178,7 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
 <body>
 
     <?php if ($is_blocked): ?>
-   <!-- POPUP MODAL FOR BLOCKED/UNPAID STUDENTS -->
+    <!-- POPUP MODAL FOR BLOCKED/UNPAID STUDENTS -->
     <div class="blocked-modal-overlay">
         <div class="blocked-modal-box">
             <div style="font-size: 60px; line-height: 1; color: #dc2626;">⛔</div>
@@ -185,13 +208,23 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             <h3>📅 Attendance History</h3>
             <?php if (!empty($attendance_records)): ?>
                 <table>
-                    <tr><th>Date</th><th>Status</th></tr>
+                    <thead>
+                        <tr><th>Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
                     <?php foreach ($attendance_records as $att): ?>
+                        <?php 
+                            $stClass = 'status-present';
+                            $stLow = strtolower(trim((string)$att['status']));
+                            if($stLow === 'absent') { $stClass = 'status-absent'; }
+                            elseif($stLow === 'leave') { $stClass = 'status-leave'; }
+                        ?>
                         <tr>
-                            <td><?= e($att['attendance_date']) ?></td>
-                            <td><?= e($att['status']) ?></td>
+                            <td><?= e(date('d M Y', strtotime($att['attendance_date']))) ?></td>
+                            <td><span class="status-badge <?= $stClass ?>"><?= e(ucfirst($att['status'])) ?></span></td>
                         </tr>
                     <?php endforeach; ?>
+                    </tbody>
                 </table>
             <?php else: ?>
                 <p class="empty">No attendance records found.</p>
@@ -218,7 +251,10 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             <h3>🎓 Exam Results</h3>
             <?php if (!empty($exam_results)): ?>
                 <table>
-                    <tr><th>Subject</th><th>Marks</th><th>Grade</th></tr>
+                    <thead>
+                        <tr><th>Subject</th><th>Marks</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody>
                     <?php foreach ($exam_results as $res): ?>
                         <tr>
                             <td><?= e($res['subject_name']) ?></td>
@@ -226,6 +262,7 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
                             <td><?= e($res['grade']) ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    </tbody>
                 </table>
             <?php else: ?>
                 <p class="empty">No result records available.</p>
@@ -237,7 +274,10 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             <h3>💳 Fee Vouchers</h3>
             <?php if (!empty($fee_vouchers)): ?>
                 <table>
-                    <tr><th>Month</th><th>Amount</th><th>Status</th></tr>
+                    <thead>
+                        <tr><th>Month</th><th>Amount</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
                     <?php foreach ($fee_vouchers as $fee): ?>
                         <tr>
                             <td><?= e($fee['month_details'] ?? $fee['month'] ?? 'N/A') ?></td>
@@ -245,6 +285,7 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
                             <td><?= e($fee['status']) ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    </tbody>
                 </table>
             <?php else: ?>
                 <p class="empty">No fee vouchers generated.</p>

@@ -31,7 +31,7 @@ if ($conn) {
     $q4 = @mysqli_query($conn, "SELECT COUNT(*) as total FROM admission_enquiries");
     if ($q4 && $r4 = mysqli_fetch_assoc($q4)) { $newAdmissions = (int)$r4['total']; }
 
-    // 2. Detect Attendance Date Column Name Dynamically
+    // 2. Detect Attendance Date Column
     $dateCol = 'date';
     $chkCol = @mysqli_query($conn, "SHOW COLUMNS FROM attendance LIKE 'attendance_date'");
     if ($chkCol && mysqli_num_rows($chkCol) > 0) {
@@ -43,17 +43,17 @@ if ($conn) {
         }
     }
 
-    // 3. Overall Counts for Selected Date
-    $qp = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(status) = 'present'");
+    // 3. Overall Counts for Selected Date (Trimmed & Lowercase comparison)
+    $qp = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'present'");
     if ($qp && $rp = mysqli_fetch_assoc($qp)) { $presentCount = (int)$rp['total']; }
 
-    $qa = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(status) = 'absent'");
+    $qa = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'absent'");
     if ($qa && $ra = mysqli_fetch_assoc($qa)) { $absentCount = (int)$ra['total']; }
 
-    $ql = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(status) = 'leave'");
+    $ql = @mysqli_query($conn, "SELECT COUNT(*) as total FROM attendance WHERE DATE(`$dateCol`) = '$selectedDate' AND LOWER(TRIM(status)) = 'leave'");
     if ($ql && $rl = mysqli_fetch_assoc($ql)) { $leaveCount = (int)$rl['total']; }
 
-    // 4. Fetch All Classes
+    // 4. Fetch All Classes & Attendance Status
     $qClasses = @mysqli_query($conn, "SELECT * FROM classes ORDER BY id ASC");
 
     if ($qClasses && mysqli_num_rows($qClasses) > 0) {
@@ -74,18 +74,18 @@ if ($conn) {
                 }
             }
 
-            // Fetch Attendance Records for this class on the selected date
+            // Robust Attendance Joining (Supports class_id directly in attendance or via students table)
             $qAtt = @mysqli_query($conn, "
                 SELECT 
                     a.id,
-                    LOWER(a.status) as raw_status, 
+                    LOWER(TRIM(a.status)) as raw_status, 
                     s.student_name, 
                     s.name as std_alt_name,
                     s.admission_no,
                     a.teacher_id as marked_t_id
                 FROM attendance a
-                JOIN students s ON s.id = a.student_id
-                WHERE (s.class_id = '$cid' OR a.class_id = '$cid') 
+                LEFT JOIN students s ON s.id = a.student_id
+                WHERE (a.class_id = '$cid' OR s.class_id = '$cid') 
                   AND DATE(a.`$dateCol`) = '$selectedDate'
                 ORDER BY s.student_name ASC, s.name ASC
             ");
@@ -105,7 +105,7 @@ if ($conn) {
                         }
                     }
                     $st = strtolower(trim($attRow['raw_status'] ?? ''));
-                    $sName = !empty($attRow['student_name']) ? $attRow['student_name'] : ($attRow['std_alt_name'] ?? 'N/A');
+                    $sName = !empty($attRow['student_name']) ? $attRow['student_name'] : ($attRow['std_alt_name'] ?? 'Student');
                     
                     $stdItem = [
                         'admission_no' => $attRow['admission_no'] ?? '-',
@@ -194,7 +194,9 @@ if ($conn) {
         <small style="color:#64748b;">Showing data for date: <b><?=date('d M Y', strtotime($selectedDate))?></b></small>
     </div>
     <form method="GET" action="index.php" style="display:flex; gap:8px; align-items:center; margin:0;">
-        <input type="hidden" name="page" value="dashboard">
+        <?php if(isset($_GET['page'])): ?>
+            <input type="hidden" name="page" value="<?=e($_GET['page'])?>">
+        <?php endif; ?>
         <label for="att_date" style="font-size:13px; font-weight:bold;">Select Date:</label>
         <input type="date" id="att_date" name="att_date" value="<?=$selectedDate?>" onchange="this.form.submit()">
     </form>
@@ -357,7 +359,7 @@ function showAttList(filterType) {
                             html += '<tr><td>'+s.admission_no+'</td><td><b>'+s.student_name+'</b></td></tr>';
                         });
                     }
-                    html += '</tbody>mtable>';
+                    html += '</tbody></table>';
                 }
             } else {
                 html += '<div class="teacher-info" style="color:#dc3545;"><b>Class Teacher:</b> ' + cls.teacher_name + '</div>';
