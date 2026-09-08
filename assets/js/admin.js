@@ -1,0 +1,1 @@
+const side=document.querySelector('.sidebar');const toggle=document.getElementById('sideToggle');if(toggle)toggle.addEventListener('click',()=>side.classList.toggle('open'));document.querySelectorAll('[data-confirm]').forEach(a=>a.addEventListener('click',e=>{if(!confirm(a.dataset.confirm))e.preventDefault();}));
