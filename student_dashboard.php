@@ -99,7 +99,7 @@ function getTableColumns($db_conn, $table) {
     }
 }
 
-// 2. FETCH ATTENDANCE (STRICT FILTER)
+// 2. FETCH ATTENDANCE
 $attendance_records = [];
 try {
     $att_cols = getTableColumns($db_conn, 'attendance');
@@ -145,9 +145,11 @@ try {
     }
 } catch (Throwable $e) {}
 
-// 4. FETCH EXAM RESULTS (STRICT & EXACT MATCH)
+// 4. FETCH EXAM RESULTS
 $exam_results = [];
 try {
+    $res_cols = getTableColumns($db_conn, 'results');
+
     $subjects_map = [];
     try {
         $sub_query = $db_conn->query("SELECT * FROM subjects");
@@ -162,7 +164,6 @@ try {
         }
     } catch (Throwable $ex) {}
 
-    $res_cols = getTableColumns($db_conn, 'results');
     $where_clauses = [];
     $params = [];
 
@@ -173,7 +174,7 @@ try {
     if (in_array('student_name', $res_cols)) { $where_clauses[] = "`student_name` = ?"; $params[] = $std_name; }
 
     if (!empty($where_clauses)) {
-        $res_sql = "SELECT * FROM results WHERE (" . implode(' OR ', $where_clauses) . ") ORDER BY id DESC";
+        $res_sql = "SELECT * FROM results WHERE " . implode(' OR ', $where_clauses) . " ORDER BY id DESC";
         $res_stmt = $db_conn->prepare($res_sql);
         $res_stmt->execute($params);
         $raw_results = $res_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -218,7 +219,7 @@ try {
     }
 } catch (Throwable $e) {}
 
-// 5. FETCH FEE VOUCHERS (STRICT MATCH ONLY)
+// 5. FETCH FEE VOUCHERS
 $fee_vouchers = [];
 try {
     $fee_cols = getTableColumns($db_conn, 'fees');
@@ -237,6 +238,7 @@ try {
 
         foreach ($raw_fees as $row) {
             $fee_vouchers[] = [
+                'id'            => $row['id'] ?? 0,
                 'month_details' => $row['month_details'] ?? $row['month'] ?? $row['fee_month'] ?? 'Monthly Fee',
                 'amount'        => number_format((float)($row['amount'] ?? $row['total_amount'] ?? 0), 2),
                 'status'        => $row['status'] ?? 'Unpaid'
@@ -245,7 +247,26 @@ try {
     }
 } catch (Throwable $e) {}
 
-// 6. BLOCK LOGIC
+// 6. FETCH CLASS HOMEWORK
+$homework_records = [];
+if ($class_id > 0) {
+    try {
+        $hw_stmt = $db_conn->prepare("SELECT * FROM homework WHERE class_id = ? ORDER BY id DESC LIMIT 10");
+        $hw_stmt->execute([$class_id]);
+        $raw_hw = $hw_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($raw_hw as $row) {
+            $homework_records[] = [
+                'title'       => $row['title'] ?? 'Homework',
+                'subject'     => $row['subject'] ?? 'General',
+                'description' => $row['description'] ?? 'No additional description provided.',
+                'due_date'    => !empty($row['due_date']) ? date('d M Y', strtotime($row['due_date'])) : 'N/A'
+            ];
+        }
+    } catch (Throwable $e) {}
+}
+
+// 7. BLOCK LOGIC
 $st_val = strtolower(trim((string)($student['status'] ?? 'paid')));
 $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
 ?>
@@ -270,6 +291,9 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
         td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
         tr:hover td { background-color: #f8fafc; }
 
+        .clickable-row { cursor: pointer; transition: background 0.2s; }
+        .clickable-row:hover td { background-color: #eff6ff !important; }
+
         .grade-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; background: #e0f2fe; color: #0369a1; text-align: center; min-width: 24px; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: capitalize; }
         .status-present { background: #d1fae5; color: #065f46; }
@@ -277,6 +301,11 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
         .status-leave { background: #fef3c7; color: #92400e; }
         .status-paid { background: #d1fae5; color: #065f46; }
         .status-unpaid { background: #fee2e2; color: #991b1b; }
+
+        .btn-print { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; text-decoration: none; color: #fff; }
+        .btn-print.paid { background: #10b981; }
+        .btn-print.unpaid { background: #ef4444; }
+        .btn-print:hover { opacity: 0.9; }
 
         .notice-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease-in-out; }
         .notice-card:hover { border-color: #2563eb; background: #eff6ff; transform: translateY(-1px); }
@@ -369,9 +398,39 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             <?php endif; ?>
         </div>
 
+        <!-- Class Homework -->
+        <div class="card">
+            <h3>📚 Class Homework</h3>
+            <?php if (!empty($homework_records)): ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Details</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($homework_records as $index => $hw): ?>
+                        <tr class="clickable-row" onclick="openHomeworkModal(<?= $index ?>)">
+                            <td><span class="grade-badge" style="min-width:auto; padding:3px 8px;"><?= e($hw['subject']) ?></span></td>
+                            <td>
+                                <strong><?= e($hw['title']) ?></strong>
+                            </td>
+                            <td><span class="status-badge status-leave"><?= e($hw['due_date']) ?></span></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="empty">No homework assigned yet.</p>
+            <?php endif; ?>
+        </div>
+
         <!-- Exam Results -->
         <div class="card">
             <h3>🎓 Exam Results</h3>
+
             <?php if (!empty($exam_results)): ?>
                 <table>
                     <thead>
@@ -391,6 +450,11 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                <div style="margin-top:15px; text-align:right;">
+                    <a href="print_result.php?id=<?= $student['id'] ?? $user['id'] ?? 0 ?>" target="_blank" style="background:#2563eb; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold; display:inline-block;">
+                        📄 Print Result Card
+                    </a>
+                </div>
             <?php else: ?>
                 <p class="empty">No result records available.</p>
             <?php endif; ?>
@@ -402,15 +466,25 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             <?php if (!empty($fee_vouchers)): ?>
                 <table>
                     <thead>
-                        <tr><th>Month</th><th>Amount</th><th>Status</th></tr>
+                        <tr><th>Month</th><th>Amount</th><th>Status</th><th>Action</th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($fee_vouchers as $fee): ?>
-                        <?php $f_st = strtolower(trim((string)$fee['status'])) === 'paid' ? 'status-paid' : 'status-unpaid'; ?>
+                        <?php 
+                            $isPaid = strtolower(trim((string)$fee['status'])) === 'paid';
+                            $f_st = $isPaid ? 'status-paid' : 'status-unpaid'; 
+                        ?>
                         <tr>
                             <td><?= e($fee['month_details'] ?? 'N/A') ?></td>
                             <td><strong>Rs. <?= e($fee['amount']) ?></strong></td>
                             <td><span class="status-badge <?= $f_st ?>"><?= e(ucfirst($fee['status'])) ?></span></td>
+                            <td>
+                                <?php if ($isPaid): ?>
+                                    <a href="print_voucher.php?id=<?= $fee['id'] ?>" target="_blank" class="btn-print paid">🖨️ Print Receipt</a>
+                                <?php else: ?>
+                                    <a href="print_voucher.php?id=<?= $fee['id'] ?>" target="_blank" class="btn-print unpaid">🖨️ Print Voucher</a>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -431,9 +505,21 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
         </div>
     </div>
 
+    <!-- Homework Modal Popup -->
+    <div id="hwModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeHwModal()">&times;</span>
+            <h3 id="hwModalTitle">Homework Title</h3>
+            <div class="notice-date" id="hwModalDate" style="color:#2563eb;">Due Date: </div>
+            <p id="hwModalBody">Homework Description...</p>
+        </div>
+    </div>
+
     <script>
         const noticesData = <?= json_encode($announcements, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        const homeworkData = <?= json_encode($homework_records, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 
+        // Notice Modal Logic
         function openNoticeModal(index) {
             const notice = noticesData[index];
             if (notice) {
@@ -448,10 +534,30 @@ $is_blocked = in_array($st_val, ['unpaid', 'blocked', 'inactive', '0']);
             document.getElementById('noticeModal').style.display = 'none';
         }
 
+        // Homework Modal Logic
+        function openHomeworkModal(index) {
+            const hw = homeworkData[index];
+            if (hw) {
+                document.getElementById('hwModalTitle').innerText = (hw.subject ? hw.subject + ' - ' : '') + (hw.title || 'Homework');
+                document.getElementById('hwModalBody').innerText = hw.description || 'No additional description provided.';
+                document.getElementById('hwModalDate').innerText = 'Due Date: ' + (hw.due_date || 'N/A');
+                document.getElementById('hwModal').style.display = 'flex';
+            }
+        }
+
+        function closeHwModal() {
+            document.getElementById('hwModal').style.display = 'none';
+        }
+
+        // Close Modals on Outer Click
         window.onclick = function(event) {
-            var modal = document.getElementById('noticeModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
+            var noticeModal = document.getElementById('noticeModal');
+            var hwModal = document.getElementById('hwModal');
+            if (event.target == noticeModal) {
+                noticeModal.style.display = "none";
+            }
+            if (event.target == hwModal) {
+                hwModal.style.display = "none";
             }
         }
     </script>

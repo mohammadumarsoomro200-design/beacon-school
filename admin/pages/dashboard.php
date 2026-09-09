@@ -13,16 +13,7 @@ $presentCount = $absentCount = $leaveCount = 0;
 $recent = [];
 
 // Date setup (Default: Date picker OR latest date in DB)
-$selectedDate = $_GET['att_date'] ?? '';
-if (empty($selectedDate) && $conn) {
-    $qD = @mysqli_query($conn, "SELECT MAX(attendance_date) as mdate FROM attendance");
-    if ($qD && $rD = mysqli_fetch_assoc($qD)) {
-        $selectedDate = $rD['mdate'];
-    }
-}
-if (empty($selectedDate)) {
-    $selectedDate = date('Y-m-d');
-}
+$selectedDate = $_GET['att_date'] ?? date('Y-m-d');
 
 $classListData = [];
 
