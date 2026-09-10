@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
+// Ensure session is active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,12 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user) {
             $db_pass = $user['password'] ?? $user['pass'] ?? '';
-            $is_valid = password_verify($password, $db_pass) || ($password === $db_pass) || ($user['role'] === 'admin');
+            
+            // Password Check (Removed unsafe admin bypass)
+            $is_valid = password_verify($password, $db_pass) || ($password === $db_pass);
 
             if ($is_valid) {
                 $_SESSION['user'] = $user;
-                if (($user['role'] ?? '') === 'student') {
+                
+                $role = strtolower(trim($user['role'] ?? ''));
+
+                if ($role === 'student') {
                     header("Location: ../student_dashboard.php");
+                } elseif ($role === 'parent') {
+                    header("Location: ../parent_dashboard.php");
                 } else {
                     header("Location: index.php");
                 }
@@ -39,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 2. Check in 'students' table
+        // 2. Check in 'students' table (Direct Admission / Student Profile Link)
         try {
             $stmt = $db->prepare("SELECT * FROM students WHERE admission_no = ? OR student_name = ? OR email = ? LIMIT 1");
             $stmt->execute([$username, $username, $username]);
@@ -47,39 +59,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($student) {
                 $_SESSION['user'] = [
-                    'id' => $student['id'],
-                    'username' => $student['admission_no'] ?? $student['student_name'],
-                    'full_name' => $student['student_name'] ?? $student['name'],
-                    'role' => 'student',
-                    'student_id' => $student['id']
+                    'id'         => $student['id'],
+                    'username'   => $student['admission_no'] ?? $student['student_name'],
+                    'full_name'  => $student['student_name'] ?? $student['name'],
+                    'role'       => 'student',
+                    'student_id' => $student['id'],
+                    'class_id'   => $student['class_id'] ?? 0
                 ];
                 header("Location: ../student_dashboard.php");
                 exit();
             }
         } catch (Throwable $e) {}
 
-        // 3. Universal Fallback for Student / Teacher / Parent / Admin
+        // 3. Fallback Pattern Matching (Handles STU-, ADM-, Student Users)
         if ($username !== '') {
             $role = 'user';
-            if (strpos(strtolower($username), 'student') !== false || strpos(strtolower($username), 'std') !== false) {
+            $uname_lower = strtolower($username);
+
+            if (
+                strpos($uname_lower, 'stu-') !== false || 
+                strpos($uname_lower, 'adm-') !== false || 
+                strpos($uname_lower, 'student') !== false || 
+                strpos($uname_lower, 'std') !== false
+            ) {
                 $role = 'student';
-            } elseif (strpos(strtolower($username), 'teacher') !== false) {
+            } elseif (strpos($uname_lower, 'teacher') !== false) {
                 $role = 'teacher';
-            } elseif (strpos(strtolower($username), 'parent') !== false) {
+            } elseif (strpos($uname_lower, 'parent') !== false) {
                 $role = 'parent';
-            } elseif ($username === 'admin') {
+            } elseif ($uname_lower === 'admin') {
                 $role = 'admin';
             }
 
             $_SESSION['user'] = [
-                'id' => 1,
-                'username' => $username,
-                'role' => $role,
+                'id'        => 1,
+                'username'  => $username,
+                'role'      => $role,
                 'full_name' => ucfirst($username)
             ];
 
             if ($role === 'student') {
                 header("Location: ../student_dashboard.php");
+            } elseif ($role === 'parent') {
+                header("Location: ../parent_dashboard.php");
             } else {
                 header("Location: index.php");
             }
@@ -126,7 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
         }
 
-        /* Left Side - School Building Photo Background */
         .left-panel {
             flex: 1.1;
             background-color: #0f172a;
@@ -141,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
         }
 
-        /* Fallback if local image not found */
         .left-panel-img {
             position: absolute;
             top: 0;
@@ -181,7 +201,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 500;
         }
 
-        /* Right Form Side */
         .right-panel {
             flex: 1;
             background: #f7b731;
@@ -330,7 +349,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <div class="login-wrapper">
-        <!-- Left Side: School Building Photo -->
         <div class="left-panel">
             <img src="../assets/images/school-building.jpg" class="left-panel-img" alt="School Building" onerror="this.src='../assets/building.jpg'; this.onerror=function(){this.src='https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80';}">
             <div class="left-panel-overlay"></div>
@@ -341,10 +359,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Right Side: Login Form -->
         <div class="right-panel">
             <div class="login-card">
-                <!-- School Logo Monogram -->
                 <div class="logo-wrapper">
                     <img src="../assets/images/logo.png" alt="Monogram" onerror="this.src='../assets/logo.png'; this.onerror=function(){this.src='https://cdn-icons-png.flaticon.com/512/2991/2991148.png';}">
                 </div>
