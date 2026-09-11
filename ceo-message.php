@@ -23,7 +23,7 @@
   <div class="page-container">
     <a href="index.php#facilities" class="back-btn">← Back to Main Page</a>
     
-    <img src="assets/images/ceo.jpg" alt="CEO - The New Beacon School System" class="profile-img">
+    <img src="assets/images/ceo.jpeg" alt="CEO" style="width: 100%; height: 350px; object-fit: contain; background-color: #f8f9fa;">
     
     <span class="role-badge">CHIEF EXECUTIVE OFFICER (CEO)</span>
     <h1>Message from the CEO</h1>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="signature">
-      — CEO Name Here
+      — CEO ADV Ali Akbar Soomro
     </div>
   </div>
 
