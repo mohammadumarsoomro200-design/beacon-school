@@ -574,9 +574,8 @@ if (!isset($db)) {
         <a href="#gallery">Gallery</a>
         <a href="#contact">Contact</a>
         <a href="admin/login.php">Portal Login</a>
-        
         <a class="nav-cta" href="#admissions">Apply Now</a>
-      </nav>          
+      </nav>         
     </div>
   </header>
 
@@ -602,6 +601,36 @@ if (!isset($db)) {
 
     <!-- News Marquee Ticker Section -->
     <style>
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: var(--navy-deep);
+}
+
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 20px 0;
+    text-align: center;
+    gap: 10px;
+  }
+  .nav.active {
+    display: flex;
+  }
+}
       .news-ticker-container {
         display: flex;
         align-items: center;
@@ -1211,5 +1240,13 @@ if (!isset($db)) {
       }
     });
   </script>
+<script>
+  const menuBtn = document.querySelector('.menu-btn');
+  const nav = document.querySelector('.nav');
+
+  menuBtn.addEventListener('click', () => {
+    nav.classList.toggle('active');
+  });
+</script>
 </body>
 </html>
