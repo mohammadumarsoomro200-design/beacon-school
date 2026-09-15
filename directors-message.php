@@ -40,18 +40,18 @@
         <span class="role-badge">DIRECTOR GENERAL (DG)</span>
         <h2>Director General's Review</h2>
         <p>"We focus on holistic development, ensuring that our curriculum balances academic rigor with creative thinking, discipline, and strong community values for lifelong learning."</p>
-        <div class="signature">— Director General Name</div>
+        <div class="signature">— Director General Mohammad Ahmed</div>
       </div>
     </div>
 
     <!-- Assistant Director General Card -->
     <div class="director-card">
-      <img src="assets/images/adg.jpeg" alt="Assistant Director General" class="director-img">
+      <img src="assets/images/adg.jpg" alt="Assistant Director General" class="director-img">
       <div>
         <span class="role-badge">ASSISTANT DIRECTOR GENERAL (ADG)</span>
         <h2>Assistant Director General's Vision</h2>
         <p>"Through continuous innovation in our teaching methodology and close parent-school collaboration, we create a supportive atmosphere where students can truly excel."</p>
-        <div class="signature">— Assistant Director General Name</div>
+        <div class="signature">— Assistant Director General Mohammad umar</div>
       </div>
     </div>
 
