@@ -46,7 +46,7 @@
 
     <!-- Assistant Director General Card -->
     <div class="director-card">
-      <img src="assets/images/adg.jpeg" alt="Assistant Director General" class="director-img">
+      <img src="assets/images/adg.jpg" alt="Assistant Director General" class="director-img">
       <div>
         <span class="role-badge">ASSISTANT DIRECTOR GENERAL (ADG)</span>
         <h2>Assistant Director General's Vision</h2>
