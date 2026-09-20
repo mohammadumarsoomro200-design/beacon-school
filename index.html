@@ -24,7 +24,6 @@ if (!isset($db)) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
   <style>
-    /* Premium Header & Navigation Modern Styles */
     :root {
       --navy-deep: #0b1d3a;
       --gold-accent: #d4af37;
@@ -37,7 +36,6 @@ if (!isset($db)) {
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Topbar Styling */
     .topbar {
       background: #07152b;
       color: rgba(255, 255, 255, 0.85);
@@ -63,7 +61,6 @@ if (!isset($db)) {
       color: var(--gold-accent);
     }
 
-    /* Glassmorphic Header Navigation */
     .header {
       position: sticky;
       top: 0;
@@ -82,7 +79,6 @@ if (!isset($db)) {
       justify-content: space-between;
     }
 
-    /* Premium Brand Logo Section */
     .brand {
       display: flex;
       align-items: center;
@@ -120,7 +116,6 @@ if (!isset($db)) {
       margin-top: 3px;
     }
 
-    /* Navigation Items with Persistent Active Line & Animated Hover */
     .nav {
       display: flex;
       align-items: center;
@@ -137,7 +132,6 @@ if (!isset($db)) {
       transition: var(--transition-standard);
     }
 
-    /* Base Underline Style for Menu Links */
     .nav a:not(.nav-cta):not(.nav-dashboard)::after {
       content: '';
       position: absolute;
@@ -152,12 +146,10 @@ if (!isset($db)) {
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Active Button Line (Always Visible) */
     .nav a.active:not(.nav-cta):not(.nav-dashboard)::after {
       transform: scaleX(1) !important;
     }
 
-    /* Hover State Line for Other Buttons */
     .nav a:not(.nav-cta):not(.nav-dashboard):hover::after {
       transform: scaleX(1);
     }
@@ -171,7 +163,6 @@ if (!isset($db)) {
       font-weight: 700;
     }
 
-    /* Dashboard & CTA Special Buttons */
     .nav a.nav-dashboard {
       color: #9a6b00;
       background: rgba(212, 175, 55, 0.12);
@@ -198,7 +189,6 @@ if (!isset($db)) {
       box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
     }
 
-    /* Swiper 3D Gallery Adjustments */
     .swiper-gallery-container {
       width: 100%;
       padding-top: 20px;
@@ -254,7 +244,6 @@ if (!isset($db)) {
       background: #f5b041;
     }
 
-    /* Professional Modern Journey Grids Styling */
     .journey-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -369,7 +358,6 @@ if (!isset($db)) {
       gap: 10px;
     }
 
-    /* Leadership Messages Section Styling */
     .leadership-cards-wrap {
       display: flex;
       flex-direction: column;
@@ -533,38 +521,37 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- News Marquee Ticker Section -->
     <style>
-.menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 26px;
-  cursor: pointer;
-  color: var(--navy-deep);
-}
+    .menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 26px;
+      cursor: pointer;
+      color: var(--navy-deep);
+    }
 
-@media (max-width: 768px) {
-  .menu-btn {
-    display: block;
-  }
-  .nav {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #ffffff;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    padding: 20px 0;
-    text-align: center;
-    gap: 10px;
-  }
-  .nav.active {
-    display: flex;
-  }
-}
+    @media (max-width: 768px) {
+      .menu-btn {
+        display: block;
+      }
+      .nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #ffffff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        padding: 20px 0;
+        text-align: center;
+        gap: 10px;
+      }
+      .nav.active {
+        display: flex;
+      }
+    }
       .news-ticker-container {
         display: flex;
         align-items: center;
@@ -666,7 +653,6 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Interactive Academics Section -->
     <section class="academics section" id="academics" style="padding: 90px 0; background: #050e1d;">
       <div class="container">
         <div class="section-head" style="text-align: center; max-width: 700px; margin: 0 auto 50px auto;">
@@ -711,7 +697,7 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Admissions Section (Wapis Add Kardiya Gaya Hai) -->
+    <!-- Admissions Section with Database Integration -->
     <section class="admission section" id="admissions" style="padding: 80px 0; background: #fdfbf7;">
       <div class="container">
         <div class="section-head center" style="text-align: center; margin-bottom: 40px;">
@@ -734,7 +720,6 @@ if (!isset($db)) {
               if (!empty($student_name) && !empty($father_name) && !empty($class_applying) && !empty($phone)) {
                   if (isset($db)) {
                       try {
-                          // Check if db is PDO or MySQLi
                           if ($db instanceof PDO) {
                               $stmt = $db->prepare("INSERT INTO admissions (student_name, father_name, class_applying, phone, address, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
                               $stmt->execute([$student_name, $father_name, $class_applying, $phone, $address]);
@@ -748,7 +733,6 @@ if (!isset($db)) {
                           }
                           $msg = "Aapka admission form kamiyabi se jama ho gaya hai! Hum jald aapse rabta karenge.";
                       } catch (Exception $e) {
-                          // Fallback table creation or generic success message if table doesn't exist yet
                           $msg = "Aapka admission form jama ho gaya hai! (Note: Database table check karlein).";
                       }
                   } else {
@@ -821,7 +805,6 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Leadership Messages Section -->
     <section class="facilities section" id="facilities">
       <div class="container">
         <div class="section-head center" style="text-align: center; margin-bottom: 40px;">
@@ -879,7 +862,6 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Modern 3D Coverflow Gallery Section -->
     <section class="gallery section" id="gallery" style="padding: 60px 0; background: #ffffff;">
       <div class="container">
         <div class="section-head center" style="text-align: center;">
@@ -948,7 +930,6 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Ultra-Professional Contact & Location Section -->
     <section id="contact" style="padding: 80px 0; background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(212, 175, 55, 0.08); border-radius: 50%; pointer-events: none;"></div>
       
@@ -1097,7 +1078,6 @@ if (!isset($db)) {
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <script>
-    // Mobile Menu Toggle
     const menuBtn = document.querySelector('.menu-btn');
     const nav = document.querySelector('.nav');
     if (menuBtn && nav) {
@@ -1107,7 +1087,6 @@ if (!isset($db)) {
       });
     }
 
-    // Initialize Swiper 3D Coverflow
     const swiper = new Swiper('.mySwiper', {
       effect: 'coverflow',
       grabCursor: true,
@@ -1135,7 +1114,6 @@ if (!isset($db)) {
       },
     });
 
-    // Lightbox Handlers
     function openLightbox(src, caption) {
       document.getElementById('lightboxImg').src = src;
       document.getElementById('lightboxCaption').innerText = caption;
@@ -1152,7 +1130,6 @@ if (!isset($db)) {
       }
     });
 
-    // Journey Modal Data & Handlers
     const journeyDetails = {
       'early-years': {
         title: 'Early Years Foundation (PG, Nursery, KG)',
