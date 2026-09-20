@@ -254,87 +254,119 @@ if (!isset($db)) {
       background: #f5b041;
     }
 
-    /* Modern Journey Grids Styling */
+    /* Professional Modern Journey Grids Styling */
     .journey-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      margin-top: 35px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      margin-top: 40px;
     }
 
     .journey-card {
-      background: #07152b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 30px 22px;
+      background: linear-gradient(145deg, #09172e, #0f2444);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 20px;
+      padding: 35px 26px;
       cursor: pointer;
       position: relative;
-      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 270px;
+      min-height: 290px;
       color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .journey-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      transition: background 0.3s ease;
     }
 
     .journey-card:hover {
       transform: translateY(-8px);
       border-color: #d4af37;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .journey-card:hover::before {
+      background: #d4af37;
     }
 
     .journey-card.active {
-      background: #d4af37;
+      background: linear-gradient(135deg, #d4af37 0%, #b89628 100%);
       color: #0b1d3a;
       border-color: #d4af37;
+      box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
     }
 
     .journey-card.active .card-num,
     .journey-card.active .card-subtitle,
     .journey-card.active p,
-    .journey-card.active .card-link {
+    .journey-card.active .card-link,
+    .journey-card.active h3 {
       color: #0b1d3a !important;
     }
 
     .journey-card .card-num {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 800;
       color: #d4af37;
-      margin-bottom: 15px;
-      display: block;
+      background: rgba(212, 175, 55, 0.15);
+      padding: 6px 12px;
+      border-radius: 8px;
+      width: fit-content;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .journey-card.active .card-num {
+      background: rgba(11, 29, 58, 0.15);
+      color: #0b1d3a;
     }
 
     .journey-card h3 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       margin-bottom: 6px;
+      font-family: 'Playfair Display', serif;
     }
 
     .journey-card .card-subtitle {
       font-size: 13px;
       font-weight: 700;
-      color: #e2e8f0;
+      color: #f1f5f9;
       margin-bottom: 12px;
       display: block;
     }
 
     .journey-card p {
       color: #94a3b8;
-      font-size: 13.5px;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.6;
       margin-bottom: 20px;
     }
 
     .journey-card .card-link {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #d4af37;
-      transition: 0.3s;
+      transition: all 0.3s ease;
       margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .journey-card:hover .card-link {
-      letter-spacing: 0.5px;
+      gap: 10px;
     }
 
     /* Leadership Messages Section Styling */
@@ -732,13 +764,13 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Interactive Academics Section -->
-    <section class="academics section" id="academics">
+    <!-- Interactive Academics Section (Upgraded & Professional) -->
+    <section class="academics section" id="academics" style="padding: 90px 0; background: #050e1d;">
       <div class="container">
-        <div class="section-head">
-          <span class="kicker">ACADEMICS</span>
-          <h2>Learning journey from PG to Matriculation</h2>
-          <p>Our academic approach combines knowledge, confidence, discipline and personal development.</p>
+        <div class="section-head" style="text-align: center; max-width: 700px; margin: 0 auto 50px auto;">
+          <span class="kicker" style="color: var(--gold-accent); font-weight: 800; letter-spacing: 2px; font-size: 12px; text-transform: uppercase;">ACADEMICS</span>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; color: #ffffff; font-weight: 800; margin-top: 10px;">Learning journey from PG to Matriculation</h2>
+          <p style="color: #94a3b8; font-size: 15px; margin-top: 12px; line-height: 1.6;">Our academic approach combines knowledge, confidence, discipline and personal development.</p>
         </div>
 
         <div class="journey-grid">
@@ -748,7 +780,7 @@ if (!isset($db)) {
             <h3>Early Years</h3>
             <span class="card-subtitle">Playgroup, Nursery & Kindergarten</span>
             <p>Learning through curiosity, play and foundational skills.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 02 (Featured) -->
@@ -757,7 +789,7 @@ if (!isset($db)) {
             <h3>Primary</h3>
             <span class="card-subtitle">Grades 1 – 5</span>
             <p>Strong basics in language, mathematics, science and social learning.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 03 -->
@@ -766,7 +798,7 @@ if (!isset($db)) {
             <h3>Middle School</h3>
             <span class="card-subtitle">Grades 6 – 8</span>
             <p>Deeper subject understanding, confidence and independent learning.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 04 -->
@@ -775,7 +807,7 @@ if (!isset($db)) {
             <h3>Secondary</h3>
             <span class="card-subtitle">Grades 9 – Matric</span>
             <p>Focused preparation, academic discipline and future readiness.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
         </div>
       </div>
@@ -1041,10 +1073,10 @@ if (!isset($db)) {
     </section>
   </main>
 
-  <!-- Dynamic Journey Modal -->
-  <div id="journeyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
-    <div style="background:#fff; color:#1e293b; max-width:600px; width:100%; padding:30px; border-radius:16px; position:relative; max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
-      <button onclick="closeJourneyModal()" style="position:absolute; top:15px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">✕</button>
+  <!-- Dynamic Journey Modal (Upgraded Professional Design) -->
+  <div id="journeyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5, 14, 29, 0.85); backdrop-filter: blur(5px); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+    <div style="background:#ffffff; color:#1e293b; max-width:580px; width:100%; padding:35px; border-radius:20px; position:relative; max-height:90vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.4); border: 1px solid rgba(212, 175, 55, 0.3);">
+      <button onclick="closeJourneyModal()" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; color:#0b1d3a; display:flex; align-items:center; justify-content:center; transition: all 0.3s ease;">✕</button>
       <div id="journeyModalContent"></div>
     </div>
   </div>
@@ -1176,12 +1208,12 @@ if (!isset($db)) {
       const data = journeyDetails[key];
       if (!data) return;
       const contentHtml = `
-        <span style="color:#d4af37; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px;">ACADEMIC PROGRAM</span>
-        <h2 style="font-family:'Playfair Display', serif; font-size:26px; color:#0b1d3a; margin:8px 0 4px 0;">${data.title}</h2>
-        <h4 style="color:#d4af37; margin-bottom:16px; font-weight:600;">${data.subtitle}</h4>
-        <p style="color:#475569; font-size:15px; line-height:1.7;">${data.desc}</p>
-        <div style="margin-top:25px; text-align:right;">
-          <a href="#admissions" onclick="closeJourneyModal()" class="btn btn-primary" style="display:inline-block; padding:10px 20px; background:#0b1d3a; color:#fff; text-decoration:none; border-radius:8px; font-weight:600;">Apply for Admission</a>
+        <span style="color:#d4af37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; background:rgba(212, 175, 55, 0.12); padding:5px 12px; border-radius:20px; display:inline-block; margin-bottom:10px;">Academic Program</span>
+        <h2 style="font-family:'Playfair Display', serif; font-size:25px; color:#0b1d3a; margin:0 0 6px 0; font-weight:800;">${data.title}</h2>
+        <h4 style="color:#d4af37; margin-bottom:15px; font-weight:700; font-size:14px;">${data.subtitle}</h4>
+        <p style="color:#475569; font-size:14.5px; line-height:1.7; margin-bottom:25px;">${data.desc}</p>
+        <div style="border-top: 1px solid #f1f5f9; padding-top:20px; display:flex; justify-content:flex-end;">
+          <a href="#admissions" onclick="closeJourneyModal()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:#0b1d3a; color:#fff; text-decoration:none; border-radius:10px; font-weight:700; font-size:13.5px; box-shadow:0 4px 12px rgba(11, 29, 58, 0.2);">Apply for Admission <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       `;
       document.getElementById('journeyModalContent').innerHTML = contentHtml;
