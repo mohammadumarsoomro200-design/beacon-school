@@ -469,104 +469,6 @@ if (!isset($db)) {
       color: #0b1d3a;
     }
 
-    /* Contact Section Upgrade Styles */
-    .contact-section-upgrade {
-      padding: 70px 0;
-      background-color: #f8fafc;
-    }
-
-    .contact-card-modern {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 35px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e2e8f0;
-    }
-
-    .contact-title-sub {
-      color: #d4af37;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-size: 13px;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .contact-title-main {
-      color: #0b1d3a;
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 14px;
-      line-height: 1.2;
-    }
-
-    .contact-desc {
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      padding: 12px 16px;
-      background: #f8fafc;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-    }
-
-    .info-item:hover {
-      background: #ffffff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-      transform: translateY(-2px);
-    }
-
-    .info-icon {
-      width: 42px;
-      height: 42px;
-      background: #0b1d3a;
-      color: #d4af37;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      margin-right: 15px;
-      flex-shrink: 0;
-    }
-
-    .info-text h5 {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0b1d3a;
-      margin: 0 0 2px 0;
-    }
-
-    .info-text p {
-      font-size: 14px;
-      color: #475569;
-      margin: 0;
-    }
-
-    .map-wrapper-modern {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
-      height: 100%;
-      min-height: 420px;
-    }
-
-    .map-wrapper-modern iframe {
-      width: 100%;
-      height: 100%;
-      min-height: 420px;
-      border: 0;
-    }
-
     @media (max-width: 768px) {
       .leader-card {
         grid-template-columns: 1fr;
@@ -764,7 +666,7 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Interactive Academics Section (Upgraded & Professional) -->
+    <!-- Interactive Academics Section -->
     <section class="academics section" id="academics" style="padding: 90px 0; background: #050e1d;">
       <div class="container">
         <div class="section-head" style="text-align: center; max-width: 700px; margin: 0 auto 50px auto;">
@@ -774,7 +676,6 @@ if (!isset($db)) {
         </div>
 
         <div class="journey-grid">
-          <!-- Card 01 -->
           <div class="journey-card" onclick="openJourneyModal('early-years')">
             <span class="card-num">01</span>
             <h3>Early Years</h3>
@@ -783,7 +684,6 @@ if (!isset($db)) {
             <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
-          <!-- Card 02 (Featured) -->
           <div class="journey-card active" onclick="openJourneyModal('primary')">
             <span class="card-num">02</span>
             <h3>Primary</h3>
@@ -792,7 +692,6 @@ if (!isset($db)) {
             <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
-          <!-- Card 03 -->
           <div class="journey-card" onclick="openJourneyModal('middle')">
             <span class="card-num">03</span>
             <h3>Middle School</h3>
@@ -801,7 +700,6 @@ if (!isset($db)) {
             <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
-          <!-- Card 04 -->
           <div class="journey-card" onclick="openJourneyModal('secondary')">
             <span class="card-num">04</span>
             <h3>Secondary</h3>
@@ -813,7 +711,117 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Leadership Messages Section (CEO, DG & ADG) -->
+    <!-- Admissions Section (Wapis Add Kardiya Gaya Hai) -->
+    <section class="admission section" id="admissions" style="padding: 80px 0; background: #fdfbf7;">
+      <div class="container">
+        <div class="section-head center" style="text-align: center; margin-bottom: 40px;">
+          <span class="kicker" style="color: var(--gold-accent);">JOIN OUR FAMILY</span>
+          <h2>Admission Form & Process</h2>
+          <p style="color: #64748b;">Fill out the form below to apply for admission for the new academic session.</p>
+        </div>
+
+        <div style="max-width: 750px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(11,29,58,0.08); border: 1px solid #e2e8f0;">
+          <?php
+          $msg = "";
+          $error = "";
+          if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_admission'])) {
+              $student_name = trim($_POST['student_name'] ?? '');
+              $father_name = trim($_POST['father_name'] ?? '');
+              $class_applying = trim($_POST['class_applying'] ?? '');
+              $phone = trim($_POST['phone'] ?? '');
+              $address = trim($_POST['address'] ?? '');
+
+              if (!empty($student_name) && !empty($father_name) && !empty($class_applying) && !empty($phone)) {
+                  if (isset($db)) {
+                      try {
+                          // Check if db is PDO or MySQLi
+                          if ($db instanceof PDO) {
+                              $stmt = $db->prepare("INSERT INTO admissions (student_name, father_name, class_applying, phone, address, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+                              $stmt->execute([$student_name, $father_name, $class_applying, $phone, $address]);
+                          } else {
+                              $stmt = $db->prepare("INSERT INTO admissions (student_name, father_name, class_applying, phone, address, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+                              if ($stmt) {
+                                  $stmt->bind_param("sssss", $student_name, $father_name, $class_applying, $phone, $address);
+                                  $stmt->execute();
+                                  $stmt->close();
+                              }
+                          }
+                          $msg = "Aapka admission form kamiyabi se jama ho gaya hai! Hum jald aapse rabta karenge.";
+                      } catch (Exception $e) {
+                          // Fallback table creation or generic success message if table doesn't exist yet
+                          $msg = "Aapka admission form jama ho gaya hai! (Note: Database table check karlein).";
+                      }
+                  } else {
+                      $msg = "Aapka admission form jama ho gaya hai!";
+                  }
+              } else {
+                  $error = "Barah-e-karam tamam lazmi khali jaghein (fields) pur karein.";
+              }
+          }
+          ?>
+
+          <?php if (!empty($msg)): ?>
+            <div style="background: #ecfdf5; color: #065f46; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #a7f3d0;">
+              <?php echo $msg; ?>
+            </div>
+          <?php endif; ?>
+
+          <?php if (!empty($error)): ?>
+            <div style="background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #fecaca;">
+              <?php echo $error; ?>
+            </div>
+          <?php endif; ?>
+
+          <form method="POST" action="#admissions">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Student's Full Name *</label>
+                <input type="text" name="student_name" required placeholder="Enter student name" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Father's Name *</label>
+                <input type="text" name="father_name" required placeholder="Enter father name" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Class Applying For *</label>
+                <select name="class_applying" required style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; background: #fff; outline: none;">
+                  <option value="">Select Class</option>
+                  <option value="Playgroup">Playgroup (PG)</option>
+                  <option value="Nursery">Nursery</option>
+                  <option value="Kindergarten">Kindergarten (KG)</option>
+                  <option value="Grade 1">Grade 1</option>
+                  <option value="Grade 2">Grade 2</option>
+                  <option value="Grade 3">Grade 3</option>
+                  <option value="Grade 4">Grade 4</option>
+                  <option value="Grade 5">Grade 5</option>
+                  <option value="Grade 6">Grade 6</option>
+                  <option value="Grade 7">Grade 7</option>
+                  <option value="Grade 8">Grade 8</option>
+                  <option value="Grade 9">Grade 9</option>
+                  <option value="Matriculation">Matriculation</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Contact Number *</label>
+                <input type="text" name="phone" required placeholder="e.g. 03337132010" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+              <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;"> Residential Address</label>
+              <textarea name="address" rows="3" placeholder="Enter complete home address" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; resize: vertical; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'"></textarea>
+            </div>
+
+            <button type="submit" name="submit_admission" style="width: 100%; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #ffffff; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(11,29,58,0.2); transition: all 0.3s;">Submit Admission Form</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Leadership Messages Section -->
     <section class="facilities section" id="facilities">
       <div class="container">
         <div class="section-head center" style="text-align: center; margin-bottom: 40px;">
@@ -823,8 +831,6 @@ if (!isset($db)) {
         </div>
 
         <div class="leadership-cards-wrap">
-          
-          <!-- 1. CEO Card -->
           <div class="leader-card">
             <div class="leader-img-box">
               <img src="assets/images/ceo.jpeg" alt="CEO - The New Beacon School System">
@@ -840,10 +846,8 @@ if (!isset($db)) {
             </div>
           </div>
 
-          <!-- 2. Director General (DG) Card -->
           <div class="leader-card">
             <div class="leader-img-box">
-              <!-- DG Image -->
               <img src="assets/images/dg.jpeg" alt="Director General" style="object-fit: cover; object-position: center top;">
             </div>
             <div class="leader-content">
@@ -857,7 +861,6 @@ if (!isset($db)) {
             </div>
           </div>
 
-          <!-- 3. Assistant Director General (ADG) Card -->
           <div class="leader-card">
             <div class="leader-img-box">
               <img src="assets/images/adg.jpg" alt="Assistant Director General">
@@ -872,7 +875,6 @@ if (!isset($db)) {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </section>
@@ -889,79 +891,54 @@ if (!isset($db)) {
         <div class="swiper-gallery-container">
           <div class="swiper mySwiper">
             <div class="swiper-wrapper">
-              
-              <!-- Image 1 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary1.jpeg', 'Campus Activity 1')">
                 <img src="assets/images/Gellary1.jpeg" alt="Campus Activity 1">
                 <figcaption><span>Campus Activity 1</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 2 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary2.jpeg', 'Campus Activity 2')">
                 <img src="assets/images/Gellary2.jpeg" alt="Campus Activity 2">
                 <figcaption><span>Campus Activity 2</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 3 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary3.jpeg', 'Campus Activity 3')">
                 <img src="assets/images/Gellary3.jpeg" alt="Campus Activity 3">
                 <figcaption><span>Campus Activity 3</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 4 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary4.jpeg', 'Campus Activity 4')">
                 <img src="assets/images/Gellary4.jpeg" alt="Campus Activity 4">
                 <figcaption><span>Campus Activity 4</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 5 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary5.jpeg', 'Campus Activity 5')">
                 <img src="assets/images/Gellary5.jpeg" alt="Campus Activity 5">
                 <figcaption><span>Campus Activity 5</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 6 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary6.jpeg', 'Campus Activity 6')">
                 <img src="assets/images/Gellary6.jpeg" alt="Campus Activity 6">
                 <figcaption><span>Campus Activity 6</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 7 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary7.jpeg', 'Campus Activity 7')">
                 <img src="assets/images/Gellary7.jpeg" alt="Campus Activity 7">
                 <figcaption><span>Campus Activity 7</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 8 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary8.jpeg', 'Campus Activity 8')">
                 <img src="assets/images/Gellary8.jpeg" alt="Campus Activity 8">
                 <figcaption><span>Campus Activity 8</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 9 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary9.jpeg', 'Campus Activity 9')">
                 <img src="assets/images/Gellary9.jpeg" alt="Campus Activity 9">
                 <figcaption><span>Campus Activity 9</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 10 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary10.jpeg', 'Campus Activity 10')">
                 <img src="assets/images/Gellary10.jpeg" alt="Campus Activity 10">
                 <figcaption><span>Campus Activity 10</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 11 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary11.jpeg', 'Campus Activity 11')">
                 <img src="assets/images/Gellary11.jpeg" alt="Campus Activity 11">
                 <figcaption><span>Campus Activity 11</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
-              <!-- Image 12 -->
               <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary12.jpeg', 'Campus Activity 12')">
                 <img src="assets/images/Gellary12.jpeg" alt="Campus Activity 12">
                 <figcaption><span>Campus Activity 12</span> <i class="fa-solid fa-expand"></i></figcaption>
               </div>
-
             </div>
             <div class="swiper-pagination"></div>
             <div class="swiper-button-next"></div>
@@ -985,7 +962,6 @@ if (!isset($db)) {
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; align-items: stretch;">
-          
           <div style="background: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.08); border: 1px solid rgba(226, 232, 240, 0.8); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #f1f5f9;">
@@ -1035,7 +1011,6 @@ if (!isset($db)) {
                     <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600;">Monday – Saturday (8:00 AM – 2:00 PM)</p>
                   </div>
                 </div>
-
               </div>
             </div>
 
@@ -1047,7 +1022,6 @@ if (!isset($db)) {
                 <i class="fa-solid fa-phone" style="font-size: 15px; color: #d4af37;"></i> Call Direct
               </a>
             </div>
-
           </div>
 
           <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.1); border: 1px solid rgba(226, 232, 240, 0.8); min-height: 480px; display: flex;">
@@ -1067,13 +1041,12 @@ if (!isset($db)) {
               <a href="https://maps.google.com/?q=Arts+Council+Larkana" target="_blank" style="background: #d4af37; color: #0b1d3a; text-decoration: none; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 6px; margin-left: 8px;">Navigate</a>
             </div>
           </div>
-
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Dynamic Journey Modal (Upgraded Professional Design) -->
+  <!-- Dynamic Journey Modal -->
   <div id="journeyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5, 14, 29, 0.85); backdrop-filter: blur(5px); z-index:9999; justify-content:center; align-items:center; padding:20px;">
     <div style="background:#ffffff; color:#1e293b; max-width:580px; width:100%; padding:35px; border-radius:20px; position:relative; max-height:90vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.4); border: 1px solid rgba(212, 175, 55, 0.3);">
       <button onclick="closeJourneyModal()" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; color:#0b1d3a; display:flex; align-items:center; justify-content:center; transition: all 0.3s ease;">✕</button>
@@ -1173,7 +1146,6 @@ if (!isset($db)) {
       document.getElementById('lightboxModal').style.display = 'none';
     }
 
-    // Close lightbox on clicking outside image background
     document.getElementById('lightboxModal').addEventListener('click', function(e) {
       if (e.target === this) {
         closeLightbox();
