@@ -254,87 +254,119 @@ if (!isset($db)) {
       background: #f5b041;
     }
 
-    /* Modern Journey Grids Styling */
+    /* Professional Modern Journey Grids Styling */
     .journey-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      margin-top: 35px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      margin-top: 40px;
     }
 
     .journey-card {
-      background: #07152b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 30px 22px;
+      background: linear-gradient(145deg, #09172e, #0f2444);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 20px;
+      padding: 35px 26px;
       cursor: pointer;
       position: relative;
-      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 270px;
+      min-height: 290px;
       color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .journey-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      transition: background 0.3s ease;
     }
 
     .journey-card:hover {
       transform: translateY(-8px);
       border-color: #d4af37;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .journey-card:hover::before {
+      background: #d4af37;
     }
 
     .journey-card.active {
-      background: #d4af37;
+      background: linear-gradient(135deg, #d4af37 0%, #b89628 100%);
       color: #0b1d3a;
       border-color: #d4af37;
+      box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
     }
 
     .journey-card.active .card-num,
     .journey-card.active .card-subtitle,
     .journey-card.active p,
-    .journey-card.active .card-link {
+    .journey-card.active .card-link,
+    .journey-card.active h3 {
       color: #0b1d3a !important;
     }
 
     .journey-card .card-num {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 800;
       color: #d4af37;
-      margin-bottom: 15px;
-      display: block;
+      background: rgba(212, 175, 55, 0.15);
+      padding: 6px 12px;
+      border-radius: 8px;
+      width: fit-content;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .journey-card.active .card-num {
+      background: rgba(11, 29, 58, 0.15);
+      color: #0b1d3a;
     }
 
     .journey-card h3 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       margin-bottom: 6px;
+      font-family: 'Playfair Display', serif;
     }
 
     .journey-card .card-subtitle {
       font-size: 13px;
       font-weight: 700;
-      color: #e2e8f0;
+      color: #f1f5f9;
       margin-bottom: 12px;
       display: block;
     }
 
     .journey-card p {
       color: #94a3b8;
-      font-size: 13.5px;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.6;
       margin-bottom: 20px;
     }
 
     .journey-card .card-link {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #d4af37;
-      transition: 0.3s;
+      transition: all 0.3s ease;
       margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .journey-card:hover .card-link {
-      letter-spacing: 0.5px;
+      gap: 10px;
     }
 
     /* Leadership Messages Section Styling */
@@ -732,13 +764,13 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Interactive Academics Section -->
-    <section class="academics section" id="academics">
+    <!-- Interactive Academics Section (Upgraded & Professional) -->
+    <section class="academics section" id="academics" style="padding: 90px 0; background: #050e1d;">
       <div class="container">
-        <div class="section-head">
-          <span class="kicker">ACADEMICS</span>
-          <h2>Learning journey from PG to Matriculation</h2>
-          <p>Our academic approach combines knowledge, confidence, discipline and personal development.</p>
+        <div class="section-head" style="text-align: center; max-width: 700px; margin: 0 auto 50px auto;">
+          <span class="kicker" style="color: var(--gold-accent); font-weight: 800; letter-spacing: 2px; font-size: 12px; text-transform: uppercase;">ACADEMICS</span>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; color: #ffffff; font-weight: 800; margin-top: 10px;">Learning journey from PG to Matriculation</h2>
+          <p style="color: #94a3b8; font-size: 15px; margin-top: 12px; line-height: 1.6;">Our academic approach combines knowledge, confidence, discipline and personal development.</p>
         </div>
 
         <div class="journey-grid">
@@ -748,7 +780,7 @@ if (!isset($db)) {
             <h3>Early Years</h3>
             <span class="card-subtitle">Playgroup, Nursery & Kindergarten</span>
             <p>Learning through curiosity, play and foundational skills.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 02 (Featured) -->
@@ -757,7 +789,7 @@ if (!isset($db)) {
             <h3>Primary</h3>
             <span class="card-subtitle">Grades 1 – 5</span>
             <p>Strong basics in language, mathematics, science and social learning.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 03 -->
@@ -766,7 +798,7 @@ if (!isset($db)) {
             <h3>Middle School</h3>
             <span class="card-subtitle">Grades 6 – 8</span>
             <p>Deeper subject understanding, confidence and independent learning.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
 
           <!-- Card 04 -->
@@ -775,7 +807,7 @@ if (!isset($db)) {
             <h3>Secondary</h3>
             <span class="card-subtitle">Grades 9 – Matric</span>
             <p>Focused preparation, academic discipline and future readiness.</p>
-            <span class="card-link">Explore Details →</span>
+            <span class="card-link">Explore Details <i class="fa-solid fa-arrow-right-long"></i></span>
           </div>
         </div>
       </div>
@@ -812,7 +844,7 @@ if (!isset($db)) {
           <div class="leader-card">
             <div class="leader-img-box">
               <!-- DG Image -->
-<img src="assets/images/dg.jpeg" alt="Director General" style="object-fit: cover; object-position: center top;">
+              <img src="assets/images/dg.jpeg" alt="Director General" style="object-fit: cover; object-position: center top;">
             </div>
             <div class="leader-content">
               <span class="leader-role">DIRECTOR GENERAL (DG)</span>
@@ -846,230 +878,215 @@ if (!isset($db)) {
     </section>
 
     <!-- Modern 3D Coverflow Gallery Section -->
-    <!-- 12-Image 3D Swiper Gallery + Interactive Lightbox -->
-    <!-- Modern 3D Coverflow Gallery Section -->
-<section class="gallery section" id="gallery" style="padding: 60px 0; background: #ffffff;">
-  <div class="container">
-    <div class="section-head center" style="text-align: center;">
-      <span class="kicker">CAMPUS LIFE</span>
-      <h2>Glimpses of School Activities</h2>
-      <p style="color: var(--text-muted);">Explore moments from our campus events, classroom activities, and student learning.</p>
-    </div>
-
-    <div class="swiper-gallery-container">
-      <div class="swiper mySwiper">
-        <div class="swiper-wrapper">
-          
-          <!-- Image 1 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary1.jpeg', 'Campus Activity 1')">
-            <img src="assets/images/Gellary1.jpeg" alt="Campus Activity 1">
-            <figcaption><span>Campus Activity 1</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 2 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary2.jpeg', 'Campus Activity 2')">
-            <img src="assets/images/Gellary2.jpeg" alt="Campus Activity 2">
-            <figcaption><span>Campus Activity 2</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 3 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary3.jpeg', 'Campus Activity 3')">
-            <img src="assets/images/Gellary3.jpeg" alt="Campus Activity 3">
-            <figcaption><span>Campus Activity 3</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 4 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary4.jpeg', 'Campus Activity 4')">
-            <img src="assets/images/Gellary4.jpeg" alt="Campus Activity 4">
-            <figcaption><span>Campus Activity 4</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 5 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary5.jpeg', 'Campus Activity 5')">
-            <img src="assets/images/Gellary5.jpeg" alt="Campus Activity 5">
-            <figcaption><span>Campus Activity 5</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 6 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary6.jpeg', 'Campus Activity 6')">
-            <img src="assets/images/Gellary6.jpeg" alt="Campus Activity 6">
-            <figcaption><span>Campus Activity 6</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 7 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary7.jpeg', 'Campus Activity 7')">
-            <img src="assets/images/Gellary7.jpeg" alt="Campus Activity 7">
-            <figcaption><span>Campus Activity 7</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 8 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary8.jpeg', 'Campus Activity 8')">
-            <img src="assets/images/Gellary8.jpeg" alt="Campus Activity 8">
-            <figcaption><span>Campus Activity 8</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 9 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary9.jpeg', 'Campus Activity 9')">
-            <img src="assets/images/Gellary9.jpeg" alt="Campus Activity 9">
-            <figcaption><span>Campus Activity 9</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 10 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary10.jpeg', 'Campus Activity 10')">
-            <img src="assets/images/Gellary10.jpeg" alt="Campus Activity 10">
-            <figcaption><span>Campus Activity 10</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 11 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary11.jpeg', 'Campus Activity 11')">
-            <img src="assets/images/Gellary11.jpeg" alt="Campus Activity 11">
-            <figcaption><span>Campus Activity 11</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
-          <!-- Image 12 -->
-          <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary12.jpeg', 'Campus Activity 12')">
-            <img src="assets/images/Gellary12.jpeg" alt="Campus Activity 12">
-            <figcaption><span>Campus Activity 12</span> <i class="fa-solid fa-expand"></i></figcaption>
-          </div>
-
+    <section class="gallery section" id="gallery" style="padding: 60px 0; background: #ffffff;">
+      <div class="container">
+        <div class="section-head center" style="text-align: center;">
+          <span class="kicker">CAMPUS LIFE</span>
+          <h2>Glimpses of School Activities</h2>
+          <p style="color: var(--text-muted);">Explore moments from our campus events, classroom activities, and student learning.</p>
         </div>
-        <div class="swiper-pagination"></div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+
+        <div class="swiper-gallery-container">
+          <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+              
+              <!-- Image 1 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary1.jpeg', 'Campus Activity 1')">
+                <img src="assets/images/Gellary1.jpeg" alt="Campus Activity 1">
+                <figcaption><span>Campus Activity 1</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 2 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary2.jpeg', 'Campus Activity 2')">
+                <img src="assets/images/Gellary2.jpeg" alt="Campus Activity 2">
+                <figcaption><span>Campus Activity 2</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 3 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary3.jpeg', 'Campus Activity 3')">
+                <img src="assets/images/Gellary3.jpeg" alt="Campus Activity 3">
+                <figcaption><span>Campus Activity 3</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 4 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary4.jpeg', 'Campus Activity 4')">
+                <img src="assets/images/Gellary4.jpeg" alt="Campus Activity 4">
+                <figcaption><span>Campus Activity 4</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 5 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary5.jpeg', 'Campus Activity 5')">
+                <img src="assets/images/Gellary5.jpeg" alt="Campus Activity 5">
+                <figcaption><span>Campus Activity 5</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 6 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary6.jpeg', 'Campus Activity 6')">
+                <img src="assets/images/Gellary6.jpeg" alt="Campus Activity 6">
+                <figcaption><span>Campus Activity 6</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 7 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary7.jpeg', 'Campus Activity 7')">
+                <img src="assets/images/Gellary7.jpeg" alt="Campus Activity 7">
+                <figcaption><span>Campus Activity 7</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 8 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary8.jpeg', 'Campus Activity 8')">
+                <img src="assets/images/Gellary8.jpeg" alt="Campus Activity 8">
+                <figcaption><span>Campus Activity 8</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 9 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary9.jpeg', 'Campus Activity 9')">
+                <img src="assets/images/Gellary9.jpeg" alt="Campus Activity 9">
+                <figcaption><span>Campus Activity 9</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 10 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary10.jpeg', 'Campus Activity 10')">
+                <img src="assets/images/Gellary10.jpeg" alt="Campus Activity 10">
+                <figcaption><span>Campus Activity 10</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 11 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary11.jpeg', 'Campus Activity 11')">
+                <img src="assets/images/Gellary11.jpeg" alt="Campus Activity 11">
+                <figcaption><span>Campus Activity 11</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+              <!-- Image 12 -->
+              <div class="swiper-slide" onclick="openLightbox('assets/images/Gellary12.jpeg', 'Campus Activity 12')">
+                <img src="assets/images/Gellary12.jpeg" alt="Campus Activity 12">
+                <figcaption><span>Campus Activity 12</span> <i class="fa-solid fa-expand"></i></figcaption>
+              </div>
+
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-    <!-- Modernized Contact Us Section -->
-    <!-- Modern Contact Section -->
-<!-- Ultra-Professional Contact & Location Section -->
-<section id="contact" style="padding: 80px 0; background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%); position: relative; overflow: hidden;">
-  
-  <!-- Subtle Background Pattern Decoration -->
-  <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(212, 175, 55, 0.08); border-radius: 50%; blur(40px); pointer-events: none;"></div>
-  
-  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2;">
-    
-    <!-- Header Badge & Title -->
-    <div style="text-align: center; margin-bottom: 50px;">
-      <span style="background: rgba(212, 175, 55, 0.15); color: #8a6d0b; font-weight: 800; font-size: 11px; padding: 6px 16px; border-radius: 20px; letter-spacing: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
-        <i class="fa-solid fa-compass" style="margin-right: 6px;"></i> Reach Out To Us
-      </span>
-      <h2 style="font-family: 'Playfair Display', serif; font-size: 40px; color: #0b1d3a; font-weight: 800; margin: 0; letter-spacing: -0.5px;">Visit Larkana</h2>
-      <p style="color: #64748b; max-width: 550px; margin: 10px auto 0 auto; font-size: 15px; line-height: 1.6;">We welcome parents and guardians to explore our campus, consult our academic advisors, and experience our learning environment.</p>
-    </div>
-
-    <!-- Main Grid Container -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; align-items: stretch;">
+    <!-- Ultra-Professional Contact & Location Section -->
+    <section id="contact" style="padding: 80px 0; background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(212, 175, 55, 0.08); border-radius: 50%; pointer-events: none;"></div>
       
-      <!-- Left Card: Contact Info -->
-      <div style="background: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.08); border: 1px solid rgba(226, 232, 240, 0.8); display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #f1f5f9;">
-            <h3 style="font-size: 20px; color: #0b1d3a; margin: 0; font-weight: 700;">Campus Information</h3>
-            <span style="font-size: 12px; color: #10b981; background: #ecfdf5; padding: 4px 10px; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
-              <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%; display: inline-block;"></span> Open For Admissions
-            </span>
-          </div>
-
-          <!-- Contact Details Grid -->
-          <div style="display: flex; flex-direction: column; gap: 18px;">
-            
-            <!-- Address Box -->
-            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
-              <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
-                <i class="fa-solid fa-location-dot"></i>
-              </div>
-              <div>
-                <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Campus Address</span>
-                <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600; line-height: 1.4;">Behind Arts Council, Larkana, Sindh</p>
-              </div>
-            </div>
-
-            <!-- Phone Box -->
-            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
-              <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
-                <i class="fa-solid fa-phone-volume"></i>
-              </div>
-              <div>
-                <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Helpline / Contact</span>
-                <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600;">0333-7132010</p>
-              </div>
-            </div>
-
-            <!-- Email Box -->
-            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
-              <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
-                <i class="fa-solid fa-envelope-open-text"></i>
-              </div>
-              <div>
-                <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Email Inquiries</span>
-                <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600; word-break: break-all;">mohammadumarsoomro200@gmail.com</p>
-              </div>
-            </div>
-
-            <!-- Timing Box -->
-            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
-              <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-              </div>
-              <div>
-                <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Visiting Hours</span>
-                <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600;">Monday – Saturday (8:00 AM – 2:00 PM)</p>
-              </div>
-            </div>
-
-          </div>
+      <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2;">
+        <div style="text-align: center; margin-bottom: 50px;">
+          <span style="background: rgba(212, 175, 55, 0.15); color: #8a6d0b; font-weight: 800; font-size: 11px; padding: 6px 16px; border-radius: 20px; letter-spacing: 2px; text-transform: uppercase; display: inline-block; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
+            <i class="fa-solid fa-compass" style="margin-right: 6px;"></i> Reach Out To Us
+          </span>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 40px; color: #0b1d3a; font-weight: 800; margin: 0; letter-spacing: -0.5px;">Visit Larkana</h2>
+          <p style="color: #64748b; max-width: 550px; margin: 10px auto 0 auto; font-size: 15px; line-height: 1.6;">We welcome parents and guardians to explore our campus, consult our academic advisors, and experience our learning environment.</p>
         </div>
 
-        <!-- Interactive Direct Buttons -->
-        <div style="margin-top: 30px; display: flex; gap: 12px;">
-          <a href="https://wa.me/923337132010" target="_blank" style="flex: 1; text-align: center; background: #25d366; color: #ffffff; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);">
-            <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> WhatsApp
-          </a>
-          <a href="tel:03337132010" style="flex: 1; text-align: center; background: #0b1d3a; color: #ffffff; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 15px rgba(11, 29, 58, 0.2);">
-            <i class="fa-solid fa-phone" style="font-size: 15px; color: #d4af37;"></i> Call Direct
-          </a>
-        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; align-items: stretch;">
+          
+          <div style="background: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.08); border: 1px solid rgba(226, 232, 240, 0.8); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #f1f5f9;">
+                <h3 style="font-size: 20px; color: #0b1d3a; margin: 0; font-weight: 700;">Campus Information</h3>
+                <span style="font-size: 12px; color: #10b981; background: #ecfdf5; padding: 4px 10px; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%; display: inline-block;"></span> Open For Admissions
+                </span>
+              </div>
 
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
+                  <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div>
+                    <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Campus Address</span>
+                    <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600; line-height: 1.4;">Behind Arts Council, Larkana, Sindh</p>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
+                  <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
+                    <i class="fa-solid fa-phone-volume"></i>
+                  </div>
+                  <div>
+                    <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Helpline / Contact</span>
+                    <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600;">0333-7132010</p>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
+                  <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                  </div>
+                  <div>
+                    <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Email Inquiries</span>
+                    <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600; word-break: break-all;">mohammadumarsoomro200@gmail.com</p>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 16px; padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; transition: all 0.3s ease;">
+                  <div style="width: 46px; height: 46px; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.15);">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </div>
+                  <div>
+                    <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px;">Visiting Hours</span>
+                    <p style="margin: 2px 0 0 0; color: #1e293b; font-size: 14px; font-weight: 600;">Monday – Saturday (8:00 AM – 2:00 PM)</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 12px;">
+              <a href="https://wa.me/923337132010" target="_blank" style="flex: 1; text-align: center; background: #25d366; color: #ffffff; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);">
+                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> WhatsApp
+              </a>
+              <a href="tel:03337132010" style="flex: 1; text-align: center; background: #0b1d3a; color: #ffffff; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 15px rgba(11, 29, 58, 0.2);">
+                <i class="fa-solid fa-phone" style="font-size: 15px; color: #d4af37;"></i> Call Direct
+              </a>
+            </div>
+
+          </div>
+
+          <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.1); border: 1px solid rgba(226, 232, 240, 0.8); min-height: 480px; display: flex;">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3523.639371946897!2d68.208103!3d27.558348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3935cc6e6c1df5f3%3A0x6b876d29dfef23bd!2sArts%20Council%20Larkana!5e0!3m2!1sen!2spk!4v1700000000000!5m2!1sen!2spk" 
+              style="width: 100%; height: 100%; border: 0; filter: contrast(1.05);" 
+              allowfullscreen="" 
+              loading="lazy">
+            </iframe>
+
+            <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(11, 29, 58, 0.9); backdrop-filter: blur(8px); color: #ffffff; padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.4); box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px;">
+              <i class="fa-solid fa-location-arrow" style="color: #d4af37; font-size: 20px;"></i>
+              <div>
+                <strong style="display: block; font-size: 13px;">The New Beacon School</strong>
+                <span style="font-size: 11px; color: #cbd5e1;">Larkana</span>
+              </div>
+              <a href="https://maps.google.com/?q=Arts+Council+Larkana" target="_blank" style="background: #d4af37; color: #0b1d3a; text-decoration: none; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 6px; margin-left: 8px;">Navigate</a>
+            </div>
+          </div>
+
+        </div>
       </div>
-
-      <!-- Right Card: Embedded Premium Map with Overlays -->
-      <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(11, 29, 58, 0.1); border: 1px solid rgba(226, 232, 240, 0.8); min-height: 480px; display: flex;">
-        
-        <!-- Google Map Iframe -->
-        <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3523.639371946897!2d68.208103!3d27.558348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3935cc6e6c1df5f3%3A0x6b876d29dfef23bd!2sArts%20Council%20Larkana!5e0!3m2!1sen!2spk!4v1700000000000!5m2!1sen!2spk" 
-          style="width: 100%; height: 100%; border: 0; filter: contrast(1.05);" 
-          allowfullscreen="" 
-          loading="lazy">
-        </iframe>
-
-        <!-- Floating Get Directions Badge -->
-        <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(11, 29, 58, 0.9); backdrop-filter: blur(8px); color: #ffffff; padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.4); box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px;">
-          <i class="fa-solid fa-location-arrow" style="color: #d4af37; font-size: 20px;"></i>
-          <div>
-            <strong style="display: block; font-size: 13px;">The New Beacon School</strong>
-            <span style="font-size: 11px; color: #cbd5e1;">Larkana</span>
-          </div>
-          <a href="https://maps.google.com/?q=Arts+Council+Larkana" target="_blank" style="background: #d4af37; color: #0b1d3a; text-decoration: none; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 6px; margin-left: 8px;">Navigate</a>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-</section>
+    </section>
   </main>
 
-  <!-- Dynamic Journey Modal -->
-  <div id="journeyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding:20px;">
-    <div style="background:#fff; color:#1e293b; max-width:600px; width:100%; padding:30px; border-radius:16px; position:relative; max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
-      <button onclick="closeJourneyModal()" style="position:absolute; top:15px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">✕</button>
-      <div id="journeyModalContent">
-        <!-- Dynamic Content Injected via JS -->
-      </div>
+  <!-- Dynamic Journey Modal (Upgraded Professional Design) -->
+  <div id="journeyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5, 14, 29, 0.85); backdrop-filter: blur(5px); z-index:9999; justify-content:center; align-items:center; padding:20px;">
+    <div style="background:#ffffff; color:#1e293b; max-width:580px; width:100%; padding:35px; border-radius:20px; position:relative; max-height:90vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.4); border: 1px solid rgba(212, 175, 55, 0.3);">
+      <button onclick="closeJourneyModal()" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; color:#0b1d3a; display:flex; align-items:center; justify-content:center; transition: all 0.3s ease;">✕</button>
+      <div id="journeyModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Dynamic Lightbox Modal for Gallery Pictures -->
+  <div id="lightboxModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; padding:20px;">
+    <div style="position:relative; max-width:800px; width:100%; text-align:center;">
+      <button onclick="closeLightbox()" style="position:absolute; top:-45px; right:0; background:none; border:none; font-size:32px; cursor:pointer; color:#fff; font-weight:bold;">&times;</button>
+      <img id="lightboxImg" src="" alt="Enlarged View" style="width:100%; max-height:80vh; object-fit:contain; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+      <p id="lightboxCaption" style="color:#fff; margin-top:15px; font-size:18px; font-weight:600;"></p>
     </div>
   </div>
 
@@ -1111,7 +1128,10 @@ if (!isset($db)) {
     const menuBtn = document.querySelector('.menu-btn');
     const nav = document.querySelector('.nav');
     if (menuBtn && nav) {
-      menuBtn.addEventListener('click', () => nav.classList.toggle('open'));
+      menuBtn.addEventListener('click', () => {
+        nav.classList.toggle('active');
+        nav.classList.toggle('open');
+      });
     }
 
     // Initialize Swiper 3D Coverflow
@@ -1142,6 +1162,24 @@ if (!isset($db)) {
       },
     });
 
+    // Lightbox Handlers
+    function openLightbox(src, caption) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightboxCaption').innerText = caption;
+      document.getElementById('lightboxModal').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').style.display = 'none';
+    }
+
+    // Close lightbox on clicking outside image background
+    document.getElementById('lightboxModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLightbox();
+      }
+    });
+
     // Journey Modal Data & Handlers
     const journeyDetails = {
       'early-years': {
@@ -1170,12 +1208,12 @@ if (!isset($db)) {
       const data = journeyDetails[key];
       if (!data) return;
       const contentHtml = `
-        <span style="color:#d4af37; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px;">ACADEMIC PROGRAM</span>
-        <h2 style="font-family:'Playfair Display', serif; font-size:26px; color:#0b1d3a; margin:8px 0 4px 0;">${data.title}</h2>
-        <h4 style="color:#d4af37; margin-bottom:16px; font-weight:600;">${data.subtitle}</h4>
-        <p style="color:#475569; font-size:15px; line-height:1.7;">${data.desc}</p>
-        <div style="margin-top:25px; text-align:right;">
-          <a href="#admissions" onclick="closeJourneyModal()" class="btn btn-primary" style="display:inline-block; padding:10px 20px; background:#0b1d3a; color:#fff; text-decoration:none; border-radius:8px; font-weight:600;">Apply for Admission</a>
+        <span style="color:#d4af37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; background:rgba(212, 175, 55, 0.12); padding:5px 12px; border-radius:20px; display:inline-block; margin-bottom:10px;">Academic Program</span>
+        <h2 style="font-family:'Playfair Display', serif; font-size:25px; color:#0b1d3a; margin:0 0 6px 0; font-weight:800;">${data.title}</h2>
+        <h4 style="color:#d4af37; margin-bottom:15px; font-weight:700; font-size:14px;">${data.subtitle}</h4>
+        <p style="color:#475569; font-size:14.5px; line-height:1.7; margin-bottom:25px;">${data.desc}</p>
+        <div style="border-top: 1px solid #f1f5f9; padding-top:20px; display:flex; justify-content:flex-end;">
+          <a href="#admissions" onclick="closeJourneyModal()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:#0b1d3a; color:#fff; text-decoration:none; border-radius:10px; font-weight:700; font-size:13.5px; box-shadow:0 4px 12px rgba(11, 29, 58, 0.2);">Apply for Admission <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       `;
       document.getElementById('journeyModalContent').innerHTML = contentHtml;
@@ -1185,50 +1223,6 @@ if (!isset($db)) {
     function closeJourneyModal() {
       document.getElementById('journeyModal').style.display = 'none';
     }
-
-    // Admission Form Handler
-    document.getElementById('admissionForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const formMsg = document.getElementById('formMsg') || document.createElement('div');
-      formMsg.id = 'formMsg';
-      formMsg.style.marginTop = '10px';
-      formMsg.style.fontWeight = 'bold';
-      formMsg.style.color = '#d4af37';
-      formMsg.innerText = 'Submitting...';
-      this.appendChild(formMsg);
-
-      const formData = new FormData(this);
-
-      try {
-        const response = await fetch('admission.php', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-          formMsg.style.color = '#10b981';
-          formMsg.innerText = data.message;
-          this.reset();
-        } else {
-          formMsg.style.color = '#ef4444';
-          formMsg.innerText = data.message || 'Submission failed.';
-        }
-      } catch (err) {
-        formMsg.style.color = '#ef4444';
-        formMsg.innerText = 'Server Error! Check database configuration.';
-      }
-    });
   </script>
-<script>
-  const menuBtn = document.querySelector('.menu-btn');
-  const nav = document.querySelector('.nav');
-
-  menuBtn.addEventListener('click', () => {
-    nav.classList.toggle('active');
-  });
-</script>
 </body>
 </html>
