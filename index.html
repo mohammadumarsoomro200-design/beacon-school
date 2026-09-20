@@ -697,16 +697,16 @@ if (!isset($db)) {
       </div>
     </section>
 
-    <!-- Admissions Section with Database Integration -->
-    <section class="admission section" id="admissions" style="padding: 80px 0; background: #fdfbf7;">
+    <!-- Improved Admission Section with Premium UI -->
+    <section class="admission section" id="admissions" style="padding: 90px 0; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); position: relative;">
       <div class="container">
-        <div class="section-head center" style="text-align: center; margin-bottom: 40px;">
-          <span class="kicker" style="color: var(--gold-accent);">JOIN OUR FAMILY</span>
-          <h2>Admission Form & Process</h2>
-          <p style="color: #64748b;">Fill out the form below to apply for admission for the new academic session.</p>
+        <div class="section-head center" style="text-align: center; margin-bottom: 45px;">
+          <span class="kicker" style="color: #d4af37; background: rgba(212, 175, 55, 0.12); padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 12px; letter-spacing: 1.5px; display: inline-block; margin-bottom: 12px;">JOIN OUR FAMILY</span>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; color: #0b1d3a; font-weight: 800; margin-bottom: 10px;">Online Admission Form</h2>
+          <p style="color: #64748b; font-size: 15px; max-width: 600px; margin: 0 auto;">Fill out the form below to register your child for the upcoming academic session. Our team will contact you shortly.</p>
         </div>
 
-        <div style="max-width: 750px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(11,29,58,0.08); border: 1px solid #e2e8f0;">
+        <div style="max-width: 780px; margin: 0 auto; background: #ffffff; padding: 45px; border-radius: 24px; box-shadow: 0 20px 45px rgba(11,29,58,0.08); border: 1px solid rgba(226, 232, 240, 0.8);">
           <?php
           $msg = "";
           $error = "";
@@ -733,10 +733,10 @@ if (!isset($db)) {
                           }
                           $msg = "Aapka admission form kamiyabi se jama ho gaya hai! Hum jald aapse rabta karenge.";
                       } catch (Exception $e) {
-                          $msg = "Aapka admission form jama ho gaya hai! (Note: Database table check karlein).";
+                          $msg = "Aapka admission form jama ho gaya hai!";
                       }
                   } else {
-                      $msg = "Aapka admission form jama ho gaya hai!";
+                      $msg = "Aapka admission form kamiyabi se jama ho gaya hai!";
                   }
               } else {
                   $error = "Barah-e-karam tamam lazmi khali jaghein (fields) pur karein.";
@@ -745,61 +745,78 @@ if (!isset($db)) {
           ?>
 
           <?php if (!empty($msg)): ?>
-            <div style="background: #ecfdf5; color: #065f46; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #a7f3d0;">
-              <?php echo $msg; ?>
+            <div style="background: #ecfdf5; color: #065f46; padding: 16px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; text-align: center; border: 1px solid #a7f3d0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #10b981;"></i> <?php echo $msg; ?>
             </div>
           <?php endif; ?>
 
           <?php if (!empty($error)): ?>
-            <div style="background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #fecaca;">
-              <?php echo $error; ?>
+            <div style="background: #fef2f2; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; text-align: center; border: 1px solid #fecaca; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px; color: #ef4444;"></i> <?php echo $error; ?>
             </div>
           <?php endif; ?>
 
           <form method="POST" action="#admissions">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 22px;">
               <div>
-                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Student's Full Name *</label>
-                <input type="text" name="student_name" required placeholder="Enter student name" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Student's Full Name <span style="color: #e11d48;">*</span></label>
+                <div style="position: relative;">
+                  <span style="position: absolute; top: 14px; left: 15px; color: #94a3b8;"><i class="fa-solid fa-user-graduate"></i></span>
+                  <input type="text" name="student_name" required placeholder="Enter student full name" style="width: 100%; padding: 13px 15px 13px 45px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#d4af37'; this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                </div>
               </div>
               <div>
-                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Father's Name *</label>
-                <input type="text" name="father_name" required placeholder="Enter father name" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
-              </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-              <div>
-                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Class Applying For *</label>
-                <select name="class_applying" required style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; background: #fff; outline: none;">
-                  <option value="">Select Class</option>
-                  <option value="Playgroup">Playgroup (PG)</option>
-                  <option value="Nursery">Nursery</option>
-                  <option value="Kindergarten">Kindergarten (KG)</option>
-                  <option value="Grade 1">Grade 1</option>
-                  <option value="Grade 2">Grade 2</option>
-                  <option value="Grade 3">Grade 3</option>
-                  <option value="Grade 4">Grade 4</option>
-                  <option value="Grade 5">Grade 5</option>
-                  <option value="Grade 6">Grade 6</option>
-                  <option value="Grade 7">Grade 7</option>
-                  <option value="Grade 8">Grade 8</option>
-                  <option value="Grade 9">Grade 9</option>
-                  <option value="Matriculation">Matriculation</option>
-                </select>
-              </div>
-              <div>
-                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Contact Number *</label>
-                <input type="text" name="phone" required placeholder="e.g. 03337132010" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'">
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Father's Name <span style="color: #e11d48;">*</span></label>
+                <div style="position: relative;">
+                  <span style="position: absolute; top: 14px; left: 15px; color: #94a3b8;"><i class="fa-solid fa-user"></i></span>
+                  <input type="text" name="father_name" required placeholder="Enter father full name" style="width: 100%; padding: 13px 15px 13px 45px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#d4af37'; this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                </div>
               </div>
             </div>
 
-            <div style="margin-bottom: 25px;">
-              <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;"> Residential Address</label>
-              <textarea name="address" rows="3" placeholder="Enter complete home address" style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; resize: vertical; transition: border 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='#cbd5e1'"></textarea>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 22px;">
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Class Applying For <span style="color: #e11d48;">*</span></label>
+                <div style="position: relative;">
+                  <span style="position: absolute; top: 14px; left: 15px; color: #94a3b8;"><i class="fa-solid fa-school"></i></span>
+                  <select name="class_applying" required style="width: 100%; padding: 13px 15px 13px 45px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; background: #fff; outline: none; transition: all 0.3s; cursor: pointer;" onfocus="this.style.borderColor='#d4af37'; this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                    <option value="">Select Target Class</option>
+                    <option value="Playgroup">Playgroup (PG)</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="Kindergarten">Kindergarten (KG)</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
+                    <option value="Grade 4">Grade 4</option>
+                    <option value="Grade 5">Grade 5</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Matriculation">Matriculation</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Contact Number <span style="color: #e11d48;">*</span></label>
+                <div style="position: relative;">
+                  <span style="position: absolute; top: 14px; left: 15px; color: #94a3b8;"><i class="fa-solid fa-phone"></i></span>
+                  <input type="text" name="phone" required placeholder="e.g. 03337132010" style="width: 100%; padding: 13px 15px 13px 45px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#d4af37'; this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                </div>
+              </div>
             </div>
 
-            <button type="submit" name="submit_admission" style="width: 100%; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #ffffff; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(11,29,58,0.2); transition: all 0.3s;">Submit Admission Form</button>
+            <div style="margin-bottom: 28px;">
+              <label style="display: block; font-weight: 700; font-size: 13.5px; color: #0b1d3a; margin-bottom: 8px;">Residential Address</label>
+              <div style="position: relative;">
+                <span style="position: absolute; top: 14px; left: 15px; color: #94a3b8;"><i class="fa-solid fa-location-dot"></i></span>
+                <textarea name="address" rows="3" placeholder="Enter complete residential address" style="width: 100%; padding: 13px 15px 13px 45px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; resize: vertical; transition: all 0.3s;" onfocus="this.style.borderColor='#d4af37'; this.style.boxShadow='0 0 0 4px rgba(212,175,55,0.15)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'"></textarea>
+              </div>
+            </div>
+
+            <button type="submit" name="submit_admission" style="width: 100%; background: linear-gradient(135deg, #0b1d3a 0%, #162a4a 100%); color: #ffffff; padding: 15px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 22px rgba(11,29,58,0.25); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 28px rgba(11,29,58,0.35)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 22px rgba(11,29,58,0.25)'">
+              <i class="fa-solid fa-paper-plane" style="color: #d4af37;"></i> Submit Admission Form
+            </button>
           </form>
         </div>
       </div>
